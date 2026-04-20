@@ -21,26 +21,100 @@
       <section class="main-content-card authentication-form-card" aria-labelledby="signup-title">
         <div class="highlighted-header-banner">
           <h1 id="signup-title">Create Account</h1>
+          <p>Set up your user account and patient profile details in one step.</p>
         </div>
 
         <form class="form-fields-layout" action="patient-dashboard.html" method="get">
           <fieldset>
-            <legend>Patient Registration</legend>
+            <legend>User Account</legend>
 
-            <div>
-              <label for="signup-name">Full Name</label>
-              <input id="signup-name" type="text" autocomplete="name" placeholder="Patient name" required>
+            <div class="form-grid-two-columns">
+              <div class="form-field-span-two">
+                <label for="signup-user-account-id">User Account ID</label>
+                <input id="signup-user-account-id" type="text" value="Auto-generated after sign up" readonly>
+              </div>
+
+              <div>
+                <label for="signup-username">Username</label>
+                <input id="signup-username" type="text" autocomplete="username" placeholder="Choose username" required>
+              </div>
+
+              <div>
+                <label for="signup-email">Email</label>
+                <input id="signup-email" type="email" autocomplete="email" placeholder="name@example.com" required>
+              </div>
+
+              <div>
+                <label for="signup-password">Password Hash</label>
+                <input id="signup-password" type="password" autocomplete="new-password" placeholder="Create password" required aria-describedby="password-help">
+                <p class="form-helper-text" id="password-help">Frontend only: this stands in for the stored password hash value in the model.</p>
+              </div>
+
+              <div>
+                <label for="signup-account-status">Account Status</label>
+                <select id="signup-account-status" required>
+                  <option value="active">Active</option>
+                  <option value="pending" selected>Pending Verification</option>
+                  <option value="inactive">Inactive</option>
+                </select>
+              </div>
+
+              <div class="form-field-span-two">
+                <label for="signup-last-login">Last Login</label>
+                <input id="signup-last-login" type="text" value="No login activity yet" readonly>
+              </div>
             </div>
+          </fieldset>
 
-            <div>
-              <label for="signup-email">Email</label>
-              <input id="signup-email" type="email" autocomplete="email" placeholder="name@example.com" required>
-            </div>
+          <fieldset>
+            <legend>Patient Profile</legend>
 
-            <div>
-              <label for="signup-password">Password</label>
-              <input id="signup-password" type="password" autocomplete="new-password" placeholder="Create password" required aria-describedby="password-help">
-              <p class="form-helper-text" id="password-help">Use a password that is easy for you to remember and hard for others to guess.</p>
+            <div class="form-grid-two-columns">
+              <div>
+                <label for="signup-patient-id">Patient ID</label>
+                <input id="signup-patient-id" type="text" value="Auto-generated after sign up" readonly>
+              </div>
+
+              <div>
+                <label for="signup-user-account-link">User Account ID (FK)</label>
+                <input id="signup-user-account-link" type="text" value="Linked to generated User Account ID" readonly>
+              </div>
+
+              <div class="form-field-span-two">
+                <label for="signup-name">Full Name</label>
+                <input id="signup-name" type="text" autocomplete="name" placeholder="Patient name" required>
+              </div>
+
+              <div>
+                <label for="signup-sex">Sex</label>
+                <select id="signup-sex" required>
+                  <option value="" selected disabled>Select sex</option>
+                  <option value="female">Female</option>
+                  <option value="male">Male</option>
+                  <option value="prefer-not-to-say">Prefer not to say</option>
+                </select>
+              </div>
+
+              <div>
+                <label for="signup-age">Age</label>
+                <input id="signup-age" type="number" min="0" max="120" placeholder="Enter age" required>
+              </div>
+
+              <div>
+                <label for="signup-barangay">Barangay</label>
+                <input id="signup-barangay" type="text" placeholder="e.g. North Signal Village" required>
+              </div>
+
+              <div>
+                <label for="signup-phone">Phone Number</label>
+                <input id="signup-phone" type="tel" autocomplete="tel" placeholder="09XX-XXX-XXXX" required aria-describedby="phone-help">
+                <p class="form-helper-text" id="phone-help">Include a mobile number where clinic staff can reach you.</p>
+              </div>
+
+              <div class="form-field-span-two">
+                <label for="signup-facebook-link">Facebook Account Link</label>
+                <input id="signup-facebook-link" type="url" placeholder="https://facebook.com/yourprofile">
+              </div>
             </div>
           </fieldset>
 
