@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Patient Dashboard</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-to-main-content-link" href="#main-content">Skip to main content</a>
+  <input class="theme-mode-toggle-input" type="checkbox" id="theme-mode-toggle">
+  <label class="theme-mode-toggle-label" for="theme-mode-toggle">Dark Mode</label>
+  <div class="main-page-wrapper">
+    <header class="official-unit-name-header">
+      <h1>
+        <span class="header-brand-top-line">Taguig Physical Medicine</span>
+        <span class="header-brand-bottom-line">Rehabilitation Unit</span>
+      </h1>
+      <nav class="primary-navigation-links" aria-label="Primary navigation">
+        <a class="navigation-current-page-link" href="patient-dashboard.html" aria-current="page">Patient Dashboard</a>
+        <a href="patient-scheduling.html">Scheduling</a>
+        <a href="admin-dashboard.html">Admin Dashboard</a>
+        <a href="login.html">Logout</a>
+      </nav>
+    </header>
+
+    <main class="main-content-card content-section-padding" id="main-content" aria-labelledby="patient-dashboard-title">
+      <section>
+        <h1 id="patient-dashboard-title">Patient Dashboard</h1>
+        <p class="secondary-description-text">View scheduled appointments and patient visit details in one place.</p>
+
+        <h2>Upcoming Appointments</h2>
+        <div class="stacked-information-list">
+          <article class="information-list-item">
+            <strong>General Consultation</strong>
+            <span>April 23, 2026 at 9:00 AM</span>
+          </article>
+          <article class="information-list-item">
+            <strong>Follow-up Checkup</strong>
+            <span>April 27, 2026 at 1:30 PM</span>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <footer class="official-unit-contact-footer" aria-label="PMRU Contact Details">
+      <div class="official-unit-contact-inner">
+        <div class="footer-information-grid">
+          <section class="footer-info-column">
+            <h3>Center</h3>
+            <p>Taguig Disability Resource and Development Center</p>
+          </section>
+
+          <section class="footer-info-column">
+            <h3>Address</h3>
+            <p>Ipil-ipil St. cor. 9th St. North Signal Village</p>
+          </section>
+
+          <section class="footer-info-column">
+            <h3>Connect</h3>
+            <p><a href="https://facebook.com/TAGUIGPMRU/" target="_blank" rel="noopener noreferrer">facebook.com/TAGUIGPMRU/</a></p>
+            <p>0961-7044315 / 0953-7515583</p>
+          </section>
+
+          <section class="footer-info-column">
+            <h3>Operating Hours</h3>
+            <p>Monday to Friday</p>
+            <p>7:00 AM - 4:00 PM</p>
+            <p class="footer-hours-note">except Holidays</p>
+          </section>
+        </div>
+      </div>
+    </footer>
+  </div>
+</body>
+</html>

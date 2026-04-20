@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <a class="skip-to-main-content-link" href="#main-content">Skip to main content</a>
+  <input class="theme-mode-toggle-input" type="checkbox" id="theme-mode-toggle">
+  <label class="theme-mode-toggle-label" for="theme-mode-toggle">Dark Mode</label>
+  <main class="centered-page-layout" id="main-content">
+    <div class="authentication-page-wrapper">
+      <header class="official-unit-name-header">
+        <h1>
+          <span class="header-brand-top-line">Taguig Physical Medicine</span>
+          <span class="header-brand-bottom-line">Rehabilitation Unit</span>
+        </h1>
+      </header>
+      <section class="main-content-card authentication-form-card" aria-labelledby="login-title">
+        <div class="highlighted-header-banner">
+          <h1 id="login-title">Clinic Login</h1>
+          <p>Sign in to access patient scheduling and dashboards.</p>
+        </div>
+
+        <form class="form-fields-layout" action="patient-dashboard.html" method="get">
+          <fieldset>
+            <legend>Login Details</legend>
+
+            <div>
+              <label for="login-email">Email</label>
+              <input id="login-email" type="email" autocomplete="email" placeholder="name@example.com" required>
+            </div>
+
+            <div>
+              <label for="login-password">Password</label>
+              <input id="login-password" type="password" autocomplete="current-password" placeholder="Enter password" required>
+            </div>
+          </fieldset>
+
+          <button type="submit">Log In</button>
+        </form>
+
+        <p class="account-switch-text">No account yet? <a href="signup.html">Create one</a></p>
+      </section>
+
+      <footer class="official-unit-contact-footer" aria-label="PMRU Contact Details">
+        <div class="official-unit-contact-inner">
+          <div class="footer-information-grid">
+            <section class="footer-info-column">
+              <h3>Center</h3>
+              <p>Taguig Disability Resource and Development Center</p>
+            </section>
+
+            <section class="footer-info-column">
+              <h3>Address</h3>
+              <p>Ipil-ipil St. cor. 9th St. North Signal Village</p>
+            </section>
+
+            <section class="footer-info-column">
+              <h3>Connect</h3>
+              <p><a href="https://facebook.com/TAGUIGPMRU/" target="_blank" rel="noopener noreferrer">facebook.com/TAGUIGPMRU/</a></p>
+              <p>0961-7044315 / 0953-7515583</p>
+            </section>
+
+            <section class="footer-info-column">
+              <h3>Operating Hours</h3>
+              <p>Monday to Friday</p>
+              <p>7:00 AM - 4:00 PM</p>
+              <p class="footer-hours-note">except Holidays</p>
+            </section>
+          </div>
+        </div>
+      </footer>
+    </div>
+  </main>
+</body>
+</html>
