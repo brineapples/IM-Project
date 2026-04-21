@@ -29,11 +29,6 @@
             <legend>User Account</legend>
 
             <div class="form-grid-two-columns">
-              <div class="form-field-span-two">
-                <label for="signup-user-account-id">User Account ID</label>
-                <input id="signup-user-account-id" type="text" value="Auto-generated after sign up" readonly>
-              </div>
-
               <div>
                 <label for="signup-username">Username</label>
                 <input id="signup-username" type="text" autocomplete="username" placeholder="Choose username" required>
@@ -45,24 +40,10 @@
               </div>
 
               <div>
-                <label for="signup-password">Password Hash</label>
-                <input id="signup-password" type="password" autocomplete="new-password" placeholder="Create password" required aria-describedby="password-help">
-                <p class="form-helper-text" id="password-help">Frontend only: this stands in for the stored password hash value in the model.</p>
+                <label for="signup-password">Password</label>
+                <input id="signup-password" type="password" autocomplete="new-password" placeholder="Create password" required>
               </div>
 
-              <div>
-                <label for="signup-account-status">Account Status</label>
-                <select id="signup-account-status" required>
-                  <option value="active">Active</option>
-                  <option value="pending" selected>Pending Verification</option>
-                  <option value="inactive">Inactive</option>
-                </select>
-              </div>
-
-              <div class="form-field-span-two">
-                <label for="signup-last-login">Last Login</label>
-                <input id="signup-last-login" type="text" value="No login activity yet" readonly>
-              </div>
             </div>
           </fieldset>
 
@@ -70,16 +51,6 @@
             <legend>Patient Profile</legend>
 
             <div class="form-grid-two-columns">
-              <div>
-                <label for="signup-patient-id">Patient ID</label>
-                <input id="signup-patient-id" type="text" value="Auto-generated after sign up" readonly>
-              </div>
-
-              <div>
-                <label for="signup-user-account-link">User Account ID (FK)</label>
-                <input id="signup-user-account-link" type="text" value="Linked to generated User Account ID" readonly>
-              </div>
-
               <div class="form-field-span-two">
                 <label for="signup-name">Full Name</label>
                 <input id="signup-name" type="text" autocomplete="name" placeholder="Patient name" required>
@@ -102,18 +73,63 @@
 
               <div>
                 <label for="signup-barangay">Barangay</label>
-                <input id="signup-barangay" type="text" placeholder="e.g. North Signal Village" required>
+                <select id="signup-barangay" required>
+                  <option value="" selected disabled>Select barangay</option>
+                  <optgroup label="District 1">
+                    <option value="Bagumbayan">Bagumbayan</option>
+                    <option value="Bambang">Bambang</option>
+                    <option value="Calzada">Calzada</option>
+                    <option value="Hagonoy">Hagonoy</option>
+                    <option value="Ibayo-Tipas">Ibayo-Tipas</option>
+                    <option value="Ligid-Tipas">Ligid-Tipas</option>
+                    <option value="Lower Bicutan">Lower Bicutan</option>
+                    <option value="Napindan">Napindan</option>
+                    <option value="New Lower Bicutan">New Lower Bicutan</option>
+                    <option value="Palingon">Palingon</option>
+                    <option value="San Miguel">San Miguel</option>
+                    <option value="Santa Ana">Santa Ana</option>
+                    <option value="Tuktukan">Tuktukan</option>
+                    <option value="Ususan">Ususan</option>
+                    <option value="Wawa">Wawa</option>
+                  </optgroup>
+                  <optgroup label="District 2">
+                    <option value="Central Bicutan">Central Bicutan</option>
+                    <option value="Central Signal Village">Central Signal Village</option>
+                    <option value="Fort Bonifacio">Fort Bonifacio</option>
+                    <option value="Katuparan">Katuparan</option>
+                    <option value="Maharlika Village">Maharlika Village</option>
+                    <option value="North Daang Hari">North Daang Hari</option>
+                    <option value="North Signal Village">North Signal Village</option>
+                    <option value="Pinagsama">Pinagsama</option>
+                    <option value="South Daang Hari">South Daang Hari</option>
+                    <option value="South Signal Village">South Signal Village</option>
+                    <option value="Tanyag">Tanyag</option>
+                    <option value="Upper Bicutan">Upper Bicutan</option>
+                    <option value="Western Bicutan">Western Bicutan</option>
+                  </optgroup>
+                  <optgroup label="EMBO Barangays (Transferred to Taguig)">
+                    <option value="Cembo">Cembo</option>
+                    <option value="Comembo">Comembo</option>
+                    <option value="East Rembo">East Rembo</option>
+                    <option value="Pembo">Pembo</option>
+                    <option value="Pitogo">Pitogo</option>
+                    <option value="Post Proper Northside">Post Proper Northside</option>
+                    <option value="Post Proper Southside">Post Proper Southside</option>
+                    <option value="Rizal">Rizal</option>
+                    <option value="South Cembo">South Cembo</option>
+                    <option value="West Rembo">West Rembo</option>
+                  </optgroup>
+                </select>
               </div>
 
               <div>
                 <label for="signup-phone">Phone Number</label>
                 <input id="signup-phone" type="tel" autocomplete="tel" placeholder="09XX-XXX-XXXX" required aria-describedby="phone-help">
-                <p class="form-helper-text" id="phone-help">Include a mobile number where clinic staff can reach you.</p>
               </div>
 
               <div class="form-field-span-two">
                 <label for="signup-facebook-link">Facebook Account Link</label>
-                <input id="signup-facebook-link" type="url" placeholder="https://facebook.com/yourprofile">
+                <input id="signup-facebook-link" type="text" placeholder="facebook.com/yourprofile or username">
               </div>
             </div>
           </fieldset>

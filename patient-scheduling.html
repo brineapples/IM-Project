@@ -28,88 +28,31 @@
       <section aria-labelledby="schedule-title">
         <div class="section-heading-group">
           <h1 id="schedule-title">Patient Scheduling</h1>
-          <p class="secondary-description-text">Submit your appointment request and track the linked appointment details once an admin schedules it.</p>
+          <p class="secondary-description-text">Submit your appointment request for admin review and scheduling.</p>
         </div>
 
         <form class="form-fields-layout" action="patient-dashboard.html" method="get">
           <fieldset>
-            <legend>Appointment Request</legend>
+            <legend>Request Details</legend>
 
             <div class="form-grid-two-columns">
-              <div>
-                <label for="appointment-request-id">Appointment Request ID</label>
-                <input id="appointment-request-id" type="text" value="Assigned when request is submitted" readonly>
-              </div>
+              <input id="appointment-request-patient-id" type="hidden" value="linked-to-signed-in-user">
 
-              <div>
-                <label for="appointment-request-patient-id">Patient ID (FK)</label>
-                <input id="appointment-request-patient-id" type="text" placeholder="Enter your patient ID" required>
-              </div>
-
-              <div>
-                <label for="requested-at">Requested At</label>
-                <input id="requested-at" type="datetime-local" required>
-              </div>
-
-              <div>
-                <label for="request-status">Request Status</label>
-                <select id="request-status" required>
-                  <option value="pending" selected>Pending</option>
-                  <option value="for-review">For Review</option>
-                  <option value="cancelled">Cancelled</option>
+              <div class="form-field-span-two">
+                <label for="request-type">Request Type</label>
+                <select id="request-type" name="request-type" required>
+                  <option value="" selected disabled>Select request type</option>
+                  <option value="physical-therapy">Physical Therapy</option>
+                  <option value="occupational-therapy">Occupational Therapy</option>
                 </select>
               </div>
+
+              <input id="request-status" type="hidden" value="pending">
 
               <div class="form-field-span-two">
                 <label for="reason">Request Notes</label>
                 <textarea id="reason" placeholder="Short visit reason" aria-describedby="reason-help" required></textarea>
                 <p class="form-helper-text" id="reason-help">Give a short description so clinic staff can prepare for your visit.</p>
-              </div>
-            </div>
-          </fieldset>
-
-          <fieldset>
-            <legend>Appointment</legend>
-
-            <div class="form-grid-two-columns">
-              <div>
-                <label for="appointment-id">Appointment ID</label>
-                <input id="appointment-id" type="text" value="Created after request approval" readonly>
-              </div>
-
-              <div>
-                <label for="appointment-request-link-id">Appointment Request ID (FK)</label>
-                <input id="appointment-request-link-id" type="text" value="Linked after scheduling" readonly>
-              </div>
-
-              <div>
-                <label for="scheduled-by-admin-id">Scheduled By Admin User ID (FK)</label>
-                <input id="scheduled-by-admin-id" type="text" value="Set by admin scheduler" readonly>
-              </div>
-
-              <div>
-                <label for="appointment-status">Appointment Status</label>
-                <select id="appointment-status" disabled>
-                  <option selected>Waiting for Admin Schedule</option>
-                  <option>Scheduled</option>
-                  <option>Completed</option>
-                  <option>Cancelled</option>
-                </select>
-              </div>
-
-              <div>
-                <label for="scheduled-date">Scheduled Date</label>
-                <input id="scheduled-date" type="date" readonly>
-              </div>
-
-              <div>
-                <label for="scheduled-time">Scheduled Time</label>
-                <input id="scheduled-time" type="time" readonly>
-              </div>
-
-              <div class="form-field-span-two">
-                <label for="appointment-notes">Appointment Notes</label>
-                <textarea id="appointment-notes" readonly>Admin notes will appear here after scheduling.</textarea>
               </div>
             </div>
           </fieldset>
