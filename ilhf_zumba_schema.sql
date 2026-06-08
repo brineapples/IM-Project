@@ -15,14 +15,15 @@ DROP TABLE IF EXISTS `ROLE_PERMISSION`;
 DROP TABLE IF EXISTS `PERMISSION`;
 DROP TABLE IF EXISTS `ACTION_TYPE`;
 DROP TABLE IF EXISTS `MODULE`;
+DROP TABLE IF EXISTS `MEMBERSHIP_APPLICATION`;
+DROP TABLE IF EXISTS `APPLICATION_STATUS`;
 DROP TABLE IF EXISTS `SESSION`;
-DROP TABLE IF EXISTS `BENEFICIARY`;
+DROP TABLE IF EXISTS `SESSION_STATUS`;
 DROP TABLE IF EXISTS `MEMBER`;
-DROP TABLE IF EXISTS `RELATIONSHIP_TYPE`;
+DROP TABLE IF EXISTS `MEMBER_STATUS`;
 DROP TABLE IF EXISTS `EDUCATIONAL_ATTAINMENT`;
 DROP TABLE IF EXISTS `GENDER`;
 DROP TABLE IF EXISTS `CHAPTER`;
-DROP TABLE IF EXISTS `BARANGAY`;
 DROP TABLE IF EXISTS `USER_ACCOUNT`;
 DROP TABLE IF EXISTS `ROLE`;
 
@@ -46,12 +47,6 @@ CREATE TABLE `USER_ACCOUNT` (
         ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
-CREATE TABLE `BARANGAY` (
-    `barangay_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    `barangay_name` VARCHAR(100) NOT NULL,
-    CONSTRAINT `uq_barangay_barangay_name` UNIQUE (`barangay_name`)
-) ENGINE=InnoDB;
-
 CREATE TABLE `CHAPTER` (
     `chapter_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `chapter_name` VARCHAR(100) NOT NULL,
@@ -70,34 +65,43 @@ CREATE TABLE `EDUCATIONAL_ATTAINMENT` (
     CONSTRAINT `uq_educational_attainment_level_name` UNIQUE (`level_name`)
 ) ENGINE=InnoDB;
 
-CREATE TABLE `RELATIONSHIP_TYPE` (
-    `relationship_type_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    `relationship_name` VARCHAR(50) NOT NULL,
-    CONSTRAINT `uq_relationship_type_relationship_name` UNIQUE (`relationship_name`)
+CREATE TABLE `MEMBER_STATUS` (
+    `member_status_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `status_name` VARCHAR(50) NOT NULL,
+    CONSTRAINT `uq_member_status_status_name` UNIQUE (`status_name`)
+) ENGINE=InnoDB;
+
+CREATE TABLE `APPLICATION_STATUS` (
+    `application_status_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `status_name` VARCHAR(50) NOT NULL,
+    CONSTRAINT `uq_application_status_status_name` UNIQUE (`status_name`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `MEMBER` (
-    `control_no` VARCHAR(50) PRIMARY KEY,
+    `member_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     `user_id` INT UNSIGNED NOT NULL,
     `first_name` VARCHAR(100) NOT NULL,
     `middle_name` VARCHAR(100),
     `last_name` VARCHAR(100) NOT NULL,
     `address` VARCHAR(255) NOT NULL,
     `birthday` DATE NOT NULL,
+    `member_status_id` INT UNSIGNED NOT NULL,
     `phone_number` VARCHAR(20) NOT NULL,
     `barangay_id` INT UNSIGNED NOT NULL,
     `chapter_id` INT UNSIGNED NOT NULL,
     `gender_id` INT UNSIGNED NOT NULL,
     `educational_attainment_id` INT UNSIGNED NOT NULL,
+    `primary_school` VARCHAR(150),
+    `primary_year_graduated` YEAR,
+    `secondary_school` VARCHAR(150),
+    `secondary_year_graduated` YEAR,
+    `college_school` VARCHAR(150),
+    `college_year_graduated` YEAR,
     CONSTRAINT `uq_member_user_id` UNIQUE (`user_id`),
     CONSTRAINT `fk_member_user_account`
         FOREIGN KEY (`user_id`) REFERENCES `USER_ACCOUNT` (`user_id`)
         ON UPDATE CASCADE
         ON DELETE CASCADE,
-    CONSTRAINT `fk_member_barangay`
-        FOREIGN KEY (`barangay_id`) REFERENCES `BARANGAY` (`barangay_id`)
-        ON UPDATE CASCADE
-        ON DELETE RESTRICT,
     CONSTRAINT `fk_member_chapter`
         FOREIGN KEY (`chapter_id`) REFERENCES `CHAPTER` (`chapter_id`)
         ON UPDATE CASCADE
@@ -106,25 +110,72 @@ CREATE TABLE `MEMBER` (
         FOREIGN KEY (`gender_id`) REFERENCES `GENDER` (`gender_id`)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
+    CONSTRAINT `fk_member_member_status`
+        FOREIGN KEY (`member_status_id`) REFERENCES `MEMBER_STATUS` (`member_status_id`)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
     CONSTRAINT `fk_member_educational_attainment`
         FOREIGN KEY (`educational_attainment_id`) REFERENCES `EDUCATIONAL_ATTAINMENT` (`educational_attainment_id`)
         ON UPDATE CASCADE
         ON DELETE RESTRICT
 ) ENGINE=InnoDB;
 
-CREATE TABLE `BENEFICIARY` (
-    `beneficiary_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    `control_no` VARCHAR(50) NOT NULL,
-    `beneficiary_name` VARCHAR(150) NOT NULL,
-    `relationship_type_id` INT UNSIGNED NOT NULL,
-    CONSTRAINT `fk_beneficiary_member`
-        FOREIGN KEY (`control_no`) REFERENCES `MEMBER` (`control_no`)
+CREATE TABLE `MEMBERSHIP_APPLICATION` (
+    `application_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `desired_username` VARCHAR(50) NOT NULL,
+    `password` VARCHAR(255) NOT NULL,
+    `first_name` VARCHAR(100) NOT NULL,
+    `middle_name` VARCHAR(100),
+    `last_name` VARCHAR(100) NOT NULL,
+    `address` VARCHAR(255) NOT NULL,
+    `birthday` DATE NOT NULL,
+    `member_status_id` INT UNSIGNED NOT NULL,
+    `phone_number` VARCHAR(20) NOT NULL,
+    `barangay_id` INT UNSIGNED NOT NULL,
+    `chapter_id` INT UNSIGNED NOT NULL,
+    `gender_id` INT UNSIGNED NOT NULL,
+    `educational_attainment_id` INT UNSIGNED NOT NULL,
+    `primary_school` VARCHAR(150),
+    `primary_year_graduated` YEAR,
+    `secondary_school` VARCHAR(150),
+    `secondary_year_graduated` YEAR,
+    `college_school` VARCHAR(150),
+    `college_year_graduated` YEAR,
+    `application_status_id` INT UNSIGNED NOT NULL,
+    `reviewed_by_user_id` INT UNSIGNED,
+    `reviewed_at` DATETIME,
+    `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT `uq_membership_application_username` UNIQUE (`desired_username`),
+    CONSTRAINT `fk_membership_application_member_status`
+        FOREIGN KEY (`member_status_id`) REFERENCES `MEMBER_STATUS` (`member_status_id`)
         ON UPDATE CASCADE
-        ON DELETE CASCADE,
-    CONSTRAINT `fk_beneficiary_relationship_type`
-        FOREIGN KEY (`relationship_type_id`) REFERENCES `RELATIONSHIP_TYPE` (`relationship_type_id`)
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_membership_application_chapter`
+        FOREIGN KEY (`chapter_id`) REFERENCES `CHAPTER` (`chapter_id`)
         ON UPDATE CASCADE
-        ON DELETE RESTRICT
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_membership_application_gender`
+        FOREIGN KEY (`gender_id`) REFERENCES `GENDER` (`gender_id`)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_membership_application_education`
+        FOREIGN KEY (`educational_attainment_id`) REFERENCES `EDUCATIONAL_ATTAINMENT` (`educational_attainment_id`)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_membership_application_status`
+        FOREIGN KEY (`application_status_id`) REFERENCES `APPLICATION_STATUS` (`application_status_id`)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_membership_application_reviewer`
+        FOREIGN KEY (`reviewed_by_user_id`) REFERENCES `USER_ACCOUNT` (`user_id`)
+        ON UPDATE CASCADE
+        ON DELETE SET NULL
+) ENGINE=InnoDB;
+
+CREATE TABLE `SESSION_STATUS` (
+    `status_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    `status_name` VARCHAR(50) NOT NULL,
+    CONSTRAINT `uq_session_status_status_name` UNIQUE (`status_name`)
 ) ENGINE=InnoDB;
 
 CREATE TABLE `SESSION` (
@@ -135,8 +186,13 @@ CREATE TABLE `SESSION` (
     `end_time` TIME NOT NULL,
     `location` VARCHAR(150) NOT NULL,
     `instructor_user_id` INT UNSIGNED NOT NULL,
+    `status_id` INT UNSIGNED NOT NULL,
     CONSTRAINT `fk_session_instructor_user_account`
         FOREIGN KEY (`instructor_user_id`) REFERENCES `USER_ACCOUNT` (`user_id`)
+        ON UPDATE CASCADE
+        ON DELETE RESTRICT,
+    CONSTRAINT `fk_session_session_status`
+        FOREIGN KEY (`status_id`) REFERENCES `SESSION_STATUS` (`status_id`)
         ON UPDATE CASCADE
         ON DELETE RESTRICT,
     CONSTRAINT `chk_session_time` CHECK (`end_time` > `start_time`)
@@ -186,23 +242,27 @@ CREATE TABLE `ROLE_PERMISSION` (
 
 CREATE TABLE `ACTIVITY_LOG` (
     `log_id` INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
-    `user_id` INT UNSIGNED NOT NULL,
+    `user_id` INT UNSIGNED,
     `action` VARCHAR(100) NOT NULL,
     `description` TEXT,
     `log_date` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT `fk_activity_log_user_account`
         FOREIGN KEY (`user_id`) REFERENCES `USER_ACCOUNT` (`user_id`)
         ON UPDATE CASCADE
-        ON DELETE RESTRICT
+        ON DELETE SET NULL
 ) ENGINE=InnoDB;
 
 CREATE INDEX `idx_user_account_role_id` ON `USER_ACCOUNT` (`role_id`);
 CREATE INDEX `idx_member_barangay_id` ON `MEMBER` (`barangay_id`);
 CREATE INDEX `idx_member_chapter_id` ON `MEMBER` (`chapter_id`);
 CREATE INDEX `idx_member_gender_id` ON `MEMBER` (`gender_id`);
+CREATE INDEX `idx_member_member_status_id` ON `MEMBER` (`member_status_id`);
 CREATE INDEX `idx_member_educational_attainment_id` ON `MEMBER` (`educational_attainment_id`);
-CREATE INDEX `idx_beneficiary_control_no` ON `BENEFICIARY` (`control_no`);
+CREATE INDEX `idx_membership_application_barangay_id` ON `MEMBERSHIP_APPLICATION` (`barangay_id`);
+CREATE INDEX `idx_membership_application_status_id` ON `MEMBERSHIP_APPLICATION` (`application_status_id`);
+CREATE INDEX `idx_membership_application_created_at` ON `MEMBERSHIP_APPLICATION` (`created_at`);
 CREATE INDEX `idx_session_instructor_user_id` ON `SESSION` (`instructor_user_id`);
+CREATE INDEX `idx_session_status_id` ON `SESSION` (`status_id`);
 CREATE INDEX `idx_activity_log_user_id` ON `ACTIVITY_LOG` (`user_id`);
 CREATE INDEX `idx_activity_log_log_date` ON `ACTIVITY_LOG` (`log_date`);
 
@@ -224,14 +284,12 @@ INSERT INTO `MODULE` (`module_name`) VALUES
     ('ROLE'),
     ('PERMISSION'),
     ('MEMBER'),
-    ('BENEFICIARY'),
+    ('APPLICATION'),
     ('SESSION'),
     ('ACTIVITY_LOG'),
-    ('BARANGAY'),
     ('CHAPTER'),
     ('GENDER'),
-    ('EDUCATIONAL_ATTAINMENT'),
-    ('RELATIONSHIP_TYPE');
+    ('EDUCATIONAL_ATTAINMENT');
 
 INSERT INTO `PERMISSION` (`module_id`, `action_type_id`)
 SELECT `MODULE`.`module_id`, `ACTION_TYPE`.`action_type_id`
@@ -243,6 +301,16 @@ SELECT `ROLE`.`role_id`, `PERMISSION`.`permission_id`
 FROM `ROLE`
 CROSS JOIN `PERMISSION`
 WHERE `ROLE`.`role_name` = 'Super Admin';
+
+INSERT INTO `ROLE_PERMISSION` (`role_id`, `permission_id`)
+SELECT `ROLE`.`role_id`, `PERMISSION`.`permission_id`
+FROM `ROLE`
+INNER JOIN `PERMISSION` ON 1 = 1
+INNER JOIN `MODULE` ON `MODULE`.`module_id` = `PERMISSION`.`module_id`
+INNER JOIN `ACTION_TYPE` ON `ACTION_TYPE`.`action_type_id` = `PERMISSION`.`action_type_id`
+WHERE `ROLE`.`role_name` = 'Admin'
+  AND `MODULE`.`module_name` = 'APPLICATION'
+  AND `ACTION_TYPE`.`action_name` IN ('READ', 'UPDATE', 'VIEW');
 
 INSERT INTO `CHAPTER` (`chapter_name`) VALUES
     ('Santo Niño Chapter');
@@ -260,11 +328,19 @@ INSERT INTO `EDUCATIONAL_ATTAINMENT` (`level_name`) VALUES
     ('Vocational'),
     ('Postgraduate');
 
-INSERT INTO `RELATIONSHIP_TYPE` (`relationship_name`) VALUES
-    ('Parent'),
-    ('Spouse'),
-    ('Child'),
-    ('Sibling'),
-    ('Relative'),
-    ('Guardian'),
+INSERT INTO `MEMBER_STATUS` (`status_name`) VALUES
+    ('Single'),
+    ('Married'),
+    ('Widowed'),
+    ('Separated'),
     ('Other');
+
+INSERT INTO `APPLICATION_STATUS` (`status_name`) VALUES
+    ('Pending'),
+    ('Approved'),
+    ('Rejected');
+
+INSERT INTO `SESSION_STATUS` (`status_name`) VALUES
+    ('Incoming'),
+    ('In Progress'),
+    ('Finished');
