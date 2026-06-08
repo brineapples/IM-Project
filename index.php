@@ -5,12 +5,24 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/includes/layout.php';
 
+// -----------------------------
+// Page Setup
+// -----------------------------
+
 if (userCount() === 0) {
     redirect('setup.php');
 }
 
+// -----------------------------
+// Data Preparation
+// -----------------------------
+
 $ctaPath = isLoggedIn() ? 'sessions.php' : 'apply.php';
 $ctaText = isLoggedIn() ? 'View Sessions' : 'Apply Now';
+
+// -----------------------------
+// HTML Output
+// -----------------------------
 
 renderPublicHeader('Home', 'home');
 ?>
@@ -20,7 +32,7 @@ renderPublicHeader('Home', 'home');
     </video>
     <div class="landing-hero-overlay"></div>
     <div class="container landing-hero-content">
-        <p class="landing-eyebrow">ILHF ZEST</p>
+        <p class="landing-eyebrow">ILHF</p>
         <h1>Lorem ipsum <em>dolor sit</em> amet</h1>
         <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae libero sed arcu facilisis gravida.</p>
         <div class="landing-actions">

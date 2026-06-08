@@ -5,11 +5,23 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+// -----------------------------
+// Authentication Check
+// -----------------------------
+
 requireAdminArea();
 requireSuperAdmin();
 
+// -----------------------------
+// Form Defaults
+// -----------------------------
+
 $errors = [];
 $roleName = trim($_POST['role_name'] ?? '');
+
+// -----------------------------
+// Form Handling
+// -----------------------------
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     if ($roleName === '') {
@@ -29,13 +41,21 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     }
 }
 
+// -----------------------------
+// Database Queries
+// -----------------------------
+
 $roles = db()->query(
     'SELECT r.role_id, r.role_name, COUNT(ua.user_id) AS user_count
      FROM ROLE r
      LEFT JOIN USER_ACCOUNT ua ON ua.role_id = r.role_id
      GROUP BY r.role_id, r.role_name
-     ORDER BY r.role_name'
+    ORDER BY r.role_name'
 )->fetchAll();
+
+// -----------------------------
+// HTML Output
+// -----------------------------
 
 renderAdminHeader('Roles', 'roles');
 ?>
@@ -49,8 +69,8 @@ renderAdminHeader('Roles', 'roles');
                 </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover">
+            <div class="table-responsive responsive-table-stack">
+                <table class="table table-hover responsive-stack-table">
                     <thead>
                         <tr>
                             <th>Role</th>
@@ -61,9 +81,9 @@ renderAdminHeader('Roles', 'roles');
                     <tbody>
                         <?php foreach ($roles as $role): ?>
                             <tr>
-                                <td><?= e(displayRoleName($role['role_name'])) ?></td>
-                                <td><?= e((string) $role['user_count']) ?></td>
-                                <td>
+                                <td data-label="Role"><?= e(displayRoleName($role['role_name'])) ?></td>
+                                <td data-label="Users"><?= e((string) $role['user_count']) ?></td>
+                                <td data-label="Actions">
                                     <div class="actions">
                                         <a class="btn btn-sm btn-outline-primary" href="<?= e(url('roles/permissions.php?id=' . $role['role_id'])) ?>">Permissions</a>
                                         <?php if ($role['role_name'] !== 'Super Admin'): ?>

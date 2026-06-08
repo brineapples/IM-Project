@@ -4,6 +4,10 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/helpers.php';
 
+// -----------------------------
+// Document Setup
+// -----------------------------
+
 function renderDocumentStart(string $title, string $bodyClass = 'app-body'): void
 {
     ?>
@@ -12,7 +16,7 @@ function renderDocumentStart(string $title, string $bodyClass = 'app-body'): voi
     <head>
         <meta charset="utf-8">
         <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-        <title><?= e($title) ?> | ZEST</title>
+        <title><?= e($title) ?> | ILHF</title>
         <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700,800&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="<?= e(asset('css/bootstrap.min.css')) ?>">
         <link rel="stylesheet" href="<?= e(asset('css/font-awesome.css')) ?>">
@@ -23,14 +27,22 @@ function renderDocumentStart(string $title, string $bodyClass = 'app-body'): voi
     <?php
 }
 
+// -----------------------------
+// Shared Header Pieces
+// -----------------------------
+
 function renderBrand(): void
 {
     ?>
     <a href="<?= e(url('index.php')) ?>" class="logo app-brand">
         <img class="app-brand-logo" src="<?= e(url('assets/SNC%20Logo.png')) ?>" alt="Santo Nino Chapter logo">
         <span class="app-brand-copy">
-            <span class="app-brand-title">ILHF <em>ZEST</em></span>
-            <span class="app-brand-subtitle">Zumba Event Scheduling Tracker</span>
+            <span class="app-brand-title">
+                <span class="app-brand-title-love">I Love</span>
+                <span class="app-brand-title-health">Health</span>
+                <span class="app-brand-title-fitness">&amp; Fitness</span>
+            </span>
+            <span class="app-brand-subtitle">Santo Nino Chapter</span>
         </span>
     </a>
     <?php
@@ -52,6 +64,10 @@ function renderFlashes(): void
     </div>
     <?php
 }
+
+// -----------------------------
+// Public Layout
+// -----------------------------
 
 function renderPublicHeader(string $title, string $active = ''): void
 {
@@ -91,6 +107,10 @@ function renderPublicHeader(string $title, string $active = ''): void
     <?php
 }
 
+// -----------------------------
+// Admin Layout
+// -----------------------------
+
 function renderAdminHeader(string $title, string $active = ''): void
 {
     $GLOBALS['layout_is_admin'] = true;
@@ -100,9 +120,12 @@ function renderAdminHeader(string $title, string $active = ''): void
             <div class="admin-topbar-inner">
                 <?php renderBrand(); ?>
                 <div class="admin-topbar-actions">
-                    <a href="<?= e(url('index.php')) ?>">Public Site</a>
+                    <a class="admin-link-titlecase" href="<?= e(url('index.php')) ?>">Landing Page</a>
                     <a href="<?= e(url('logout.php')) ?>">Logout</a>
                 </div>
+                <button class="admin-menu-trigger" type="button" aria-label="Toggle admin menu" aria-expanded="false">
+                    <span></span>
+                </button>
             </div>
         </header>
 
@@ -127,8 +150,11 @@ function renderAdminHeader(string $title, string $active = ''): void
                         <?php if (hasPermission('ACTIVITY_LOG', 'READ')): ?>
                             <a class="<?= $active === 'logs' ? 'active' : '' ?>" href="<?= e(url('admin/logs.php')) ?>"><i class="fa fa-list-alt"></i> Logs</a>
                         <?php endif; ?>
+                        <div class="admin-sidebar-divider"></div>
+                        <a class="admin-sidebar-utility" href="<?= e(url('logout.php')) ?>"><i class="fa fa-sign-out"></i> Logout</a>
                     </nav>
                 </aside>
+                <button class="admin-sidebar-backdrop" type="button" aria-label="Close admin menu"></button>
                 <div class="admin-content">
     <?php
 }
@@ -137,6 +163,10 @@ function renderHeader(string $title, string $active = ''): void
 {
     renderPublicHeader($title, $active);
 }
+
+// -----------------------------
+// Footer and Shared Scripts
+// -----------------------------
 
 function renderFooter(): void
 {
@@ -151,7 +181,7 @@ function renderFooter(): void
         <footer>
             <div class="container">
                 <p>
-                    &copy; ZEST, Zumba Event Scheduling Tracker. Theme base:
+                    &copy; ILHF, Santo Nino Chapter. Theme base:
                     <a href="https://templatemo.com/tm-548-training-studio" target="_blank" rel="noopener">TemplateMo 548 Training Studio</a>.
                 </p>
             </div>
@@ -159,8 +189,96 @@ function renderFooter(): void
         <script src="<?= e(asset('js/jquery-2.1.0.min.js')) ?>"></script>
         <script src="<?= e(asset('js/popper.js')) ?>"></script>
         <script src="<?= e(asset('js/bootstrap.min.js')) ?>"></script>
+        <script src="<?= e(asset('js/scrollreveal.min.js')) ?>"></script>
         <script src="<?= e(asset('js/custom.js')) ?>"></script>
         <script>
+        // Admin sidebar toggle for tablet and mobile screens.
+        (function () {
+            var body = document.body;
+            var trigger = document.querySelector('.admin-menu-trigger');
+            var sidebar = document.querySelector('.admin-sidebar');
+            var backdrop = document.querySelector('.admin-sidebar-backdrop');
+            var mobileQuery = window.matchMedia('(max-width: 1024px)');
+
+            if (!trigger || !sidebar || !backdrop) {
+                return;
+            }
+
+            function setSidebarState(isOpen) {
+                body.classList.toggle('admin-sidebar-open', isOpen);
+                trigger.classList.toggle('active', isOpen);
+                trigger.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+            }
+
+            function closeSidebar() {
+                setSidebarState(false);
+            }
+
+            trigger.addEventListener('click', function () {
+                if (!mobileQuery.matches) {
+                    return;
+                }
+
+                setSidebarState(!body.classList.contains('admin-sidebar-open'));
+            });
+
+            backdrop.addEventListener('click', closeSidebar);
+
+            sidebar.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', function () {
+                    if (mobileQuery.matches) {
+                        closeSidebar();
+                    }
+                });
+            });
+
+            window.addEventListener('resize', function () {
+                if (!mobileQuery.matches) {
+                    closeSidebar();
+                }
+            });
+        })();
+
+        // Public mobile menu toggle.
+        (function () {
+            var trigger = document.querySelector('.header-area .menu-trigger');
+            var nav = document.querySelector('.header-area .main-nav .nav');
+            var mobileQuery = window.matchMedia('(max-width: 767px)');
+
+            if (!trigger || !nav) {
+                return;
+            }
+
+            function closeMobileMenu() {
+                trigger.classList.remove('active');
+                nav.classList.remove('mobile-open');
+                nav.style.display = '';
+            }
+
+            trigger.addEventListener('click', function (event) {
+                if (!mobileQuery.matches) {
+                    return;
+                }
+
+                event.preventDefault();
+                event.stopImmediatePropagation();
+                trigger.classList.toggle('active');
+                nav.classList.toggle('mobile-open');
+                nav.style.display = nav.classList.contains('mobile-open') ? 'block' : '';
+            }, true);
+
+            nav.querySelectorAll('a').forEach(function (link) {
+                link.addEventListener('click', closeMobileMenu);
+            });
+
+            window.addEventListener('resize', function () {
+                if (!mobileQuery.matches) {
+                    closeMobileMenu();
+                }
+            });
+        })();
+
+        // Smooth scroll for the public contact link.
         document.querySelectorAll('a[href$="#trainer-profiles"]').forEach(function (link) {
             link.addEventListener('click', function (event) {
                 var target = document.getElementById('trainer-profiles');
@@ -174,6 +292,7 @@ function renderFooter(): void
             });
         });
 
+        // Hide the public header while scrolling down.
         (function () {
             var header = document.querySelector('.header-area');
             var lastScrollY = window.pageYOffset;
@@ -204,6 +323,38 @@ function renderFooter(): void
             });
         })();
 
+        // Hide the admin topbar while scrolling down.
+        (function () {
+            var topbar = document.querySelector('.admin-topbar');
+            var lastScrollY = window.pageYOffset;
+            var ticking = false;
+
+            if (!topbar) {
+                return;
+            }
+
+            function updateTopbar() {
+                var currentScrollY = window.pageYOffset;
+
+                if (currentScrollY > lastScrollY && currentScrollY > 140) {
+                    topbar.classList.add('admin-topbar-hidden');
+                } else {
+                    topbar.classList.remove('admin-topbar-hidden');
+                }
+
+                lastScrollY = Math.max(currentScrollY, 0);
+                ticking = false;
+            }
+
+            window.addEventListener('scroll', function () {
+                if (!ticking) {
+                    window.requestAnimationFrame(updateTopbar);
+                    ticking = true;
+                }
+            });
+        })();
+
+        // Lightweight reveal animation for major UI surfaces.
         (function () {
             var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
             var revealSelector = [
@@ -215,7 +366,6 @@ function renderFooter(): void
                 '.landing-band',
                 '.landing-coach-card',
                 '.admin-dashboard-card',
-                '.admin-sidebar',
                 '.table-responsive',
                 '.session-filter',
                 'form .form-group'
@@ -261,3 +411,4 @@ function renderFooter(): void
     </html>
     <?php
 }
+

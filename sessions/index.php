@@ -5,9 +5,17 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+// -----------------------------
+// Authentication Check
+// -----------------------------
+
 requireAdminArea();
 requirePermission('SESSION', 'READ');
 refreshSessionStatuses();
+
+// -----------------------------
+// Filter Preparation
+// -----------------------------
 
 $statuses = getSessionStatuses();
 $incomingStatusId = 0;
@@ -31,6 +39,10 @@ if ($statusId > 0) {
 $whereSql = $where ? ' WHERE ' . implode(' AND ', $where) : '';
 $orderDirection = strtoupper($sort);
 
+// -----------------------------
+// Database Queries
+// -----------------------------
+
 $stmt = db()->prepare(
     'SELECT s.session_id, s.session_title, s.session_date, s.start_time, s.end_time, s.location,
             ua.username AS coach_username,
@@ -44,6 +56,10 @@ $stmt = db()->prepare(
 $stmt->execute($params);
 $sessions = $stmt->fetchAll();
 
+// -----------------------------
+// HTML Output
+// -----------------------------
+
 renderAdminHeader('Manage Sessions', 'sessions');
 ?>
 <section class="section app-section">
@@ -51,7 +67,7 @@ renderAdminHeader('Manage Sessions', 'sessions');
         <div class="app-panel">
             <div class="app-heading">
                 <div>
-                    <h1>Manage <em>Sessions</em></h1>
+                    <h1>Manage <em>ZEST Sessions</em></h1>
                     <p class="app-muted mb-0">Zumba Event Scheduling Tracker for ILHF Santo Nino Chapter.</p>
                 </div>
                 <?php if (hasPermission('SESSION', 'CREATE')): ?>

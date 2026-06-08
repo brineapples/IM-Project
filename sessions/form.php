@@ -1,3 +1,9 @@
+<?php
+// -----------------------------
+// Session Form Partial
+// -----------------------------
+?>
+
 <?php if ($errors): ?>
     <div class="alert alert-danger">
         <?php foreach ($errors as $error): ?>

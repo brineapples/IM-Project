@@ -4,10 +4,18 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/includes/helpers.php';
 
+// -----------------------------
+// Activity Logging
+// -----------------------------
+
 $user = currentUser();
 if ($user) {
     logActivity((int) $user['user_id'], 'LOGOUT', 'User ' . $user['username'] . ' logged out.');
 }
+
+// -----------------------------
+// Session Cleanup
+// -----------------------------
 
 $_SESSION = [];
 
@@ -18,5 +26,10 @@ if (ini_get('session.use_cookies')) {
 
 session_destroy();
 session_start();
+
+// -----------------------------
+// Redirect
+// -----------------------------
+
 flash('success', 'You have logged out.');
 redirect('index.php');

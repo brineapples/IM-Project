@@ -169,7 +169,7 @@ CREATE TABLE `MEMBERSHIP_APPLICATION` (
     CONSTRAINT `fk_membership_application_reviewer`
         FOREIGN KEY (`reviewed_by_user_id`) REFERENCES `USER_ACCOUNT` (`user_id`)
         ON UPDATE CASCADE
-        ON DELETE SET NULL
+        ON DELETE SET NULL  
 ) ENGINE=InnoDB;
 
 CREATE TABLE `SESSION_STATUS` (

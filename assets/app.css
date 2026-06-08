@@ -1,3 +1,7 @@
+/* -----------------------------
+   Base Layout
+----------------------------- */
+
 .app-body {
     --app-radius: 18px;
     --app-radius-sm: 12px;
@@ -11,6 +15,23 @@
     --app-surface: rgba(255, 255, 255, 0.92);
     background: #fff8fb;
     color: #232d39;
+}
+
+*,
+*::before,
+*::after {
+    box-sizing: border-box;
+}
+
+body {
+    overflow-x: hidden;
+}
+
+img,
+video,
+svg {
+    display: block;
+    max-width: 100%;
 }
 
 @keyframes appFadeUp {
@@ -41,8 +62,13 @@ html {
 
 .app-main {
     min-height: calc(100vh - 150px);
+    overflow-x: clip;
     padding-top: 110px;
 }
+
+/* -----------------------------
+   Admin Layout
+----------------------------- */
 
 .admin-body {
     background:
@@ -61,7 +87,13 @@ html {
     position: fixed;
     right: 0;
     top: 0;
+    transition: transform 0.28s ease;
+    will-change: transform;
     z-index: 100;
+}
+
+.admin-topbar.admin-topbar-hidden {
+    transform: translateY(-110%);
 }
 
 .admin-topbar-inner {
@@ -69,9 +101,70 @@ html {
     display: flex;
     justify-content: space-between;
     margin: 0 auto;
-    max-width: 1320px;
-    min-height: 90px;
-    padding: 0 24px;
+    max-width: 1140px;
+    min-height: 80px;
+    padding: 0 15px;
+}
+
+.admin-menu-trigger {
+    background: #fff;
+    border: 1px solid var(--app-pink-border);
+    border-radius: 16px;
+    display: none;
+    flex: 0 0 auto;
+    height: 44px;
+    padding: 0;
+    position: relative;
+    width: 44px;
+}
+
+.header-area .main-nav .menu-trigger,
+.admin-menu-trigger {
+    background: #fff;
+    border: 1px solid var(--app-pink-border);
+    border-radius: 16px;
+    box-shadow: 0 8px 18px rgba(118, 69, 93, 0.08);
+}
+
+.admin-menu-trigger span,
+.admin-menu-trigger span::before,
+.admin-menu-trigger span::after {
+    background: #232d39;
+    border-radius: 999px;
+    height: 2px;
+    left: 11px;
+    position: absolute;
+    transition: transform 0.2s ease, opacity 0.2s ease;
+    width: 20px;
+}
+
+.admin-menu-trigger span {
+    top: 20px;
+}
+
+.admin-menu-trigger span::before,
+.admin-menu-trigger span::after {
+    content: "";
+}
+
+.admin-menu-trigger span::before {
+    top: -6px;
+}
+
+.admin-menu-trigger span::after {
+    top: 6px;
+}
+
+.admin-menu-trigger.active span {
+    background: transparent;
+}
+
+.admin-menu-trigger.active span::before {
+    transform: translateY(6px) rotate(45deg);
+}
+
+.admin-menu-trigger.active span::after {
+    transform: translateY(-6px) rotate(-45deg);
 }
 
 .admin-topbar a.logo.app-brand,
@@ -92,8 +185,8 @@ html {
 .admin-topbar .app-brand-logo {
     display: block;
     flex: 0 0 auto;
-    height: 64px;
-    width: 64px;
+    height: 58px;
+    width: 58px;
 }
 
 .admin-topbar .app-brand-copy {
@@ -101,7 +194,7 @@ html {
     display: flex !important;
     flex-direction: column;
     justify-content: center;
-    min-height: 64px;
+    min-height: 58px;
 }
 
 .admin-topbar-actions {
@@ -111,19 +204,25 @@ html {
 }
 
 .admin-topbar-actions a {
-    border: 1px solid var(--app-pink-border);
-    border-radius: 999px;
-    color: var(--app-pink-hover);
+    align-items: center;
+    color: #232d39;
+    display: inline-flex;
     font-size: 13px;
-    font-weight: 800;
-    padding: 8px 14px;
+    font-weight: 700;
+    height: 80px;
+    letter-spacing: 0.01em;
+    line-height: 80px;
+    padding: 0 16px;
     text-transform: uppercase;
-    transition: background-color 0.18s ease, border-color 0.18s ease, color 0.18s ease, transform 0.18s ease;
+    transition: color 0.18s ease, transform 0.18s ease;
+}
+
+.admin-topbar-actions a.admin-link-titlecase {
+    text-transform: none;
 }
 
 .admin-topbar-actions a:hover {
-    background: var(--app-pink-soft);
-    border-color: var(--app-pink);
+    color: var(--app-pink);
     text-decoration: none;
     transform: translateY(-1px);
 }
@@ -152,9 +251,19 @@ html {
     top: 116px;
 }
 
+.admin-sidebar-backdrop {
+    display: none;
+}
+
 .admin-sidebar nav {
     display: grid;
     gap: 8px;
+}
+
+.admin-sidebar-divider {
+    background: linear-gradient(90deg, rgba(240, 204, 217, 0), rgba(240, 204, 217, 0.95), rgba(240, 204, 217, 0));
+    height: 1px;
+    margin: 6px 2px;
 }
 
 .admin-sidebar a {
@@ -194,8 +303,16 @@ html {
     color: #fff;
 }
 
+.admin-sidebar-utility {
+    display: none !important;
+}
+
 .admin-content .section.app-section {
     padding-top: 0;
+}
+
+.admin-content {
+    min-width: 0;
 }
 
 .admin-dashboard-grid {
@@ -271,6 +388,10 @@ html {
     z-index: 1;
 }
 
+/* -----------------------------
+   Shared Page Surfaces
+----------------------------- */
+
 .app-section {
     padding: 35px 0 70px;
 }
@@ -325,16 +446,25 @@ html {
 
 .table-responsive {
     border-radius: var(--app-radius);
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    width: 100%;
 }
 
 .table {
     margin-bottom: 0;
+    width: 100%;
+}
+
+.table-responsive .table {
+    min-width: 0;
 }
 
 .table td,
 .table th {
     vertical-align: middle;
+    word-break: break-word;
 }
 
 .table thead th:first-child {
@@ -349,6 +479,10 @@ html {
     background: var(--app-pink-soft);
     border-color: var(--app-pink-border);
 }
+
+/* -----------------------------
+   Public Header and Branding
+----------------------------- */
 
 .header-area .main-nav .logo em,
 .background-header .main-nav .logo em,
@@ -366,6 +500,14 @@ html {
 
 .header-area.header-hidden {
     transform: translateY(-110%);
+}
+
+.header-area .main-nav {
+    align-items: center;
+    display: flex;
+    justify-content: space-between;
+    min-height: 80px;
+    position: relative;
 }
 
 .app-brand,
@@ -396,19 +538,32 @@ html {
     flex-direction: column;
     justify-content: center;
     min-height: 58px;
+    min-width: 0;
 }
 
 .app-brand-title {
+    align-items: baseline;
     color: #232d39;
-    font-size: 26px;
+    display: flex;
+    flex-wrap: wrap;
+    font-size: 22px;
     font-weight: 800;
-    line-height: 1;
-    text-transform: uppercase;
+    gap: 6px;
+    letter-spacing: 0.01em;
+    line-height: 1.05;
+    text-transform: none !important;
 }
 
-.app-brand-title em {
+.app-brand-title-love {
+    color: #232d39;
+}
+
+.app-brand-title-health {
+    color: #2f9e44;
+}
+
+.app-brand-title-fitness {
     color: var(--app-pink);
-    font-style: normal;
 }
 
 .app-brand-subtitle {
@@ -419,7 +574,12 @@ html {
     margin-top: 5px;
     text-transform: uppercase;
     white-space: nowrap;
+    word-break: break-word;
 }
+
+/* -----------------------------
+   Buttons, Forms, and Actions
+----------------------------- */
 
 .btn,
 .header-area .main-nav .nav li:last-child a,
@@ -482,6 +642,7 @@ select,
 input,
 textarea {
     border-radius: var(--app-radius-sm);
+    max-width: 100%;
     transition: border-color 0.18s ease, box-shadow 0.18s ease, transform 0.18s ease;
 }
 
@@ -497,6 +658,10 @@ textarea {
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
+}
+
+.actions form {
+    margin: 0;
 }
 
 .landing-actions {
@@ -523,6 +688,10 @@ textarea {
 .form-section-title:first-child {
     margin-top: 0;
 }
+
+/* -----------------------------
+   Session and Application Cards
+----------------------------- */
 
 .session-card-grid {
     display: grid;
@@ -751,6 +920,10 @@ textarea {
     margin-bottom: 22px;
 }
 
+/* -----------------------------
+   Role Permission UI
+----------------------------- */
+
 .permission-grid {
     width: 100%;
 }
@@ -858,8 +1031,13 @@ textarea {
     z-index: 1000;
 }
 
+/* -----------------------------
+   Auth and Landing Pages
+----------------------------- */
+
 .role-select-form {
     max-width: 240px;
+    width: 100%;
 }
 
 .login-panel {
@@ -894,6 +1072,7 @@ textarea {
     animation: appFadeUp 0.55s ease both;
     color: #fff;
     max-width: 760px;
+    padding: 32px 0;
     position: relative;
     z-index: 1;
 }
@@ -907,7 +1086,7 @@ textarea {
 }
 
 .landing-hero h1 {
-    font-size: 58px;
+    font-size: clamp(2.2rem, 5vw, 3.625rem);
     font-weight: 800;
     line-height: 1.05;
     margin-bottom: 18px;
@@ -920,7 +1099,7 @@ textarea {
 }
 
 .landing-hero p:not(.landing-eyebrow) {
-    font-size: 18px;
+    font-size: clamp(1rem, 2vw, 1.125rem);
     line-height: 1.7;
     margin-bottom: 28px;
     max-width: 640px;
@@ -1079,14 +1258,16 @@ textarea {
     transform: translateY(-1px);
 }
 
+/* -----------------------------
+   Motion
+----------------------------- */
+
 .table-responsive,
 .session-filter {
     animation: appFadeUp 0.36s ease both;
 }
 
-.admin-dashboard-card,
-.admin-sidebar,
-.admin-topbar {
+.admin-dashboard-card {
     animation: appFadeUp 0.42s ease both;
 }
 
@@ -1113,6 +1294,98 @@ textarea {
     transform: translateY(0);
 }
 
+/* -----------------------------
+   Responsive Rules
+----------------------------- */
+
+@media (min-width: 1440px) {
+    .admin-shell {
+        max-width: 1400px;
+    }
+
+    .landing-hero-content {
+        max-width: 840px;
+    }
+}
+
+@media (max-width: 1024px) {
+    .admin-menu-trigger {
+        display: inline-flex;
+        justify-content: center;
+        margin-left: auto;
+        order: 3;
+    }
+
+    .admin-topbar-inner {
+        display: grid;
+        gap: 14px;
+        grid-template-columns: minmax(0, 1fr) auto;
+    }
+
+    .admin-topbar .app-brand {
+        max-width: 100%;
+    }
+
+    .admin-topbar-actions {
+        display: none;
+    }
+
+    .admin-sidebar-utility {
+        display: flex !important;
+    }
+
+    .admin-shell {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .admin-sidebar {
+        bottom: 18px;
+        left: 18px;
+        max-width: 320px;
+        overflow-y: auto;
+        position: fixed;
+        top: 104px;
+        transform: translateX(calc(-100% - 24px));
+        transition: transform 0.24s ease;
+        width: min(320px, calc(100vw - 36px));
+        z-index: 140;
+    }
+
+    .admin-sidebar-backdrop {
+        background: rgba(35, 45, 57, 0.32);
+        border: 0;
+        display: block;
+        inset: 0;
+        opacity: 0;
+        pointer-events: none;
+        position: fixed;
+        transition: opacity 0.24s ease;
+        z-index: 130;
+    }
+
+    body.admin-sidebar-open {
+        overflow: hidden;
+    }
+
+    body.admin-sidebar-open .admin-sidebar {
+        transform: translateX(0);
+    }
+
+    body.admin-sidebar-open .admin-sidebar-backdrop {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .admin-dashboard-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .admin-content .container {
+        max-width: 100%;
+    }
+}
+
 @media (prefers-reduced-motion: reduce) {
     *,
     *::before,
@@ -1129,7 +1402,145 @@ textarea {
     }
 }
 
+@media (max-width: 900px) {
+    .responsive-table-stack {
+        overflow: visible;
+    }
+
+    .responsive-table-stack .responsive-stack-table,
+    .responsive-table-stack .responsive-stack-table tbody,
+    .responsive-table-stack .responsive-stack-table tr,
+    .responsive-table-stack .responsive-stack-table td {
+        display: block;
+        width: 100%;
+    }
+
+    .responsive-table-stack .responsive-stack-table {
+        min-width: 0 !important;
+    }
+
+    .responsive-table-stack .responsive-stack-table thead {
+        display: none;
+    }
+
+    .responsive-table-stack .responsive-stack-table tbody {
+        display: grid;
+        gap: 14px;
+    }
+
+    .responsive-table-stack .responsive-stack-table tr {
+        background: rgba(255, 255, 255, 0.96);
+        border: 1px solid var(--app-pink-border);
+        border-radius: 22px;
+        box-shadow: 0 12px 28px rgba(118, 69, 93, 0.1);
+        padding: 16px;
+    }
+
+    .responsive-table-stack .responsive-stack-table td {
+        border-top: 0;
+        display: grid;
+        gap: 10px;
+        grid-template-columns: minmax(96px, 38%) minmax(0, 1fr);
+        padding: 8px 0;
+    }
+
+    .responsive-table-stack .responsive-stack-table td::before {
+        color: var(--app-pink-hover);
+        content: attr(data-label);
+        font-size: 12px;
+        font-weight: 800;
+        letter-spacing: 0.02em;
+        text-transform: uppercase;
+    }
+
+    .responsive-table-stack .responsive-stack-table td[data-label="Actions"],
+    .responsive-table-stack .responsive-stack-table td[data-label="Change Role"] {
+        grid-template-columns: 1fr;
+    }
+
+    .responsive-table-stack .responsive-stack-table td[data-label="Actions"]::before,
+    .responsive-table-stack .responsive-stack-table td[data-label="Change Role"]::before {
+        margin-bottom: 2px;
+    }
+
+    .responsive-table-stack .responsive-stack-table td > .actions,
+    .responsive-table-stack .responsive-stack-table td > .role-select-form {
+        max-width: none;
+        width: 100%;
+    }
+
+    .responsive-table-stack .responsive-stack-table td .actions {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .responsive-table-stack .responsive-stack-table td .btn,
+    .responsive-table-stack .responsive-stack-table td .role-select-form select {
+        width: 100%;
+    }
+
+    .responsive-table-stack .responsive-stack-table td .form-control-sm {
+        min-height: 44px;
+    }
+}
+
 @media (max-width: 767px) {
+    .header-area {
+        background: rgba(255, 247, 251, 0.98);
+        box-shadow: 0 8px 24px rgba(118, 69, 93, 0.08);
+    }
+
+    .header-area .main-nav {
+        gap: 8px;
+        min-height: auto;
+        padding: 12px 0;
+    }
+
+    .header-area .main-nav .app-brand {
+        height: auto;
+        margin-left: 0 !important;
+        max-width: calc(100% - 56px);
+        min-height: 56px;
+        padding-right: 10px;
+        white-space: normal;
+    }
+
+    .header-area .main-nav .nav.mobile-open {
+        display: block !important;
+    }
+
+    .header-area .main-nav .nav {
+        border-top: 1px solid var(--app-pink-border);
+        margin-top: 10px !important;
+        padding-top: 10px;
+        width: 100%;
+    }
+
+    .header-area .main-nav .nav li {
+        background: transparent !important;
+        border-bottom: 0 !important;
+    }
+
+    .header-area .main-nav .nav li a {
+        background: #fff !important;
+        border: 1px solid var(--app-pink-border) !important;
+        border-radius: 16px !important;
+        height: auto !important;
+        line-height: 1.3 !important;
+        margin-bottom: 10px;
+        padding: 14px 16px !important;
+    }
+
+    .header-area .main-nav .nav li:last-child {
+        background: transparent !important;
+    }
+
+    .header-area .main-nav .menu-trigger {
+        margin-top: 0;
+        right: 0;
+        z-index: 20;
+    }
+
     .app-heading {
         align-items: flex-start;
         flex-direction: column;
@@ -1149,12 +1560,17 @@ textarea {
     }
 
     .app-brand-title {
-        font-size: 20px;
+        font-size: 16px;
+        gap: 4px;
     }
 
     .app-brand-subtitle {
         font-size: 9px;
         white-space: normal;
+    }
+
+    .app-section {
+        padding: 24px 0 48px;
     }
 
     .session-card {
@@ -1168,36 +1584,125 @@ textarea {
     }
 
     .landing-hero {
-        min-height: 620px;
+        min-height: 560px;
     }
 
     .landing-hero h1 {
-        font-size: 36px;
+        font-size: clamp(1.9rem, 8vw, 2.5rem);
     }
 
     .landing-hero p:not(.landing-eyebrow) {
         font-size: 16px;
     }
 
+    .landing-actions,
+    .actions,
+    .admin-topbar-actions {
+        width: 100%;
+    }
+
+    .landing-actions .btn,
+    .actions .btn,
+    .actions form,
+    .actions form .btn,
+    .admin-topbar-actions a,
+    .permission-save-bar .btn {
+        width: 100%;
+    }
+
+    .admin-topbar-actions {
+        gap: 8px;
+    }
+
     .admin-shell {
-        grid-template-columns: 1fr;
         padding: 16px;
     }
 
-    .admin-sidebar {
-        position: static;
+    .admin-dashboard-grid {
+        grid-template-columns: 1fr;
     }
 
     .admin-topbar-inner {
-        align-items: flex-start;
-        flex-direction: column;
+        align-items: center;
+        grid-template-columns: minmax(0, 1fr) auto;
         gap: 10px;
-        padding-bottom: 12px;
-        padding-top: 12px;
+        padding: 12px 16px;
     }
 
     .admin-main {
-        padding-top: 150px;
+        padding-top: 110px;
+    }
+
+    .admin-sidebar {
+        left: 12px;
+        top: 96px;
+        width: min(320px, calc(100vw - 24px));
+    }
+
+    .table-responsive .table {
+        min-width: 0;
+    }
+
+    .role-select-form {
+        max-width: none;
+    }
+
+    .permission-feature-grid {
+        margin-bottom: 110px;
+    }
+
+    .permission-save-bar {
+        max-width: none;
+        width: calc(100% - 24px);
     }
 
 }
+
+@media (max-width: 480px) {
+    .app-main {
+        padding-top: 96px;
+    }
+
+    .app-panel {
+        border-radius: 22px;
+        padding: 18px;
+    }
+
+    .app-heading h1,
+    .app-heading h2 {
+        font-size: 24px;
+    }
+
+    .landing-hero-content {
+        padding: 16px 0 28px;
+    }
+
+    .landing-band {
+        padding: 56px 0;
+    }
+
+    .landing-band h2 {
+        font-size: 28px;
+    }
+
+    .landing-card,
+    .landing-coach-card,
+    .application-card,
+    .admin-dashboard-card {
+        padding: 18px;
+    }
+
+    .session-card-body {
+        padding: 18px;
+    }
+
+    .session-filter {
+        padding: 16px 16px 0;
+    }
+
+    .admin-main {
+        padding-top: 102px;
+    }
+}
+
+

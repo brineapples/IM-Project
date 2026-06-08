@@ -5,12 +5,20 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/includes/layout.php';
 
+// -----------------------------
+// Page Setup
+// -----------------------------
+
 if (userCount() > 0) {
     redirect('login.php');
 }
 
 $errors = [];
 $username = trim($_POST['username'] ?? 'superadmin');
+
+// -----------------------------
+// Form Handling
+// -----------------------------
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
@@ -48,13 +56,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
+// -----------------------------
+// HTML Output
+// -----------------------------
+
 renderPublicHeader('First Setup', 'login');
 ?>
 <section class="section app-section">
     <div class="container">
         <div class="app-panel login-panel">
             <div class="app-heading">
-                <h1>ZEST <em>Setup</em></h1>
+                <h1>ILHF <em>Setup</em></h1>
             </div>
 
             <p class="app-muted">Create the first Super Admin account for Zumba Event Scheduling Tracker. This is needed because the SQL schema has roles and permissions but no user accounts.</p>

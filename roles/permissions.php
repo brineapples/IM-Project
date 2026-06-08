@@ -5,8 +5,16 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+// -----------------------------
+// Authentication Check
+// -----------------------------
+
 requireAdminArea();
 requireSuperAdmin();
+
+// -----------------------------
+// Request Data
+// -----------------------------
 
 $roleId = (int) ($_GET['id'] ?? $_POST['role_id'] ?? 0);
 $stmt = db()->prepare('SELECT role_id, role_name FROM ROLE WHERE role_id = ?');
@@ -17,6 +25,10 @@ if (!$role) {
     flash('danger', 'Role not found.');
     redirect('roles/index.php');
 }
+
+// -----------------------------
+// Feature Definitions
+// -----------------------------
 
 $featureDefinitions = [
     'SESSION' => [
@@ -50,6 +62,10 @@ $featureDefinitions = [
         'actions' => ['READ'],
     ],
 ];
+
+// -----------------------------
+// Permission Lookup Data
+// -----------------------------
 
 $allModules = db()->query('SELECT module_id, module_name FROM MODULE ORDER BY module_name')->fetchAll();
 $moduleLookup = [];
@@ -94,6 +110,10 @@ $stmt = db()->prepare('SELECT permission_id FROM ROLE_PERMISSION WHERE role_id =
 $stmt->execute([$roleId]);
 $currentPermissionIds = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
 
+// -----------------------------
+// Form Handling
+// -----------------------------
+
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $selectedPermissionIds = array_map('intval', $_POST['permissions'] ?? []);
     $selectedPermissionIds = array_values(array_intersect($selectedPermissionIds, $visiblePermissionIds));
@@ -127,6 +147,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
         redirect('roles/permissions.php?id=' . $roleId);
     }
 }
+
+// -----------------------------
+// HTML Output
+// -----------------------------
 
 renderAdminHeader('Role Permissions', 'roles');
 ?>

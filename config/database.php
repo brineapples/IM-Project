@@ -2,6 +2,10 @@
 
 declare(strict_types=1);
 
+// -----------------------------
+// Database Connection
+// -----------------------------
+
 function db(): PDO
 {
     static $pdo = null;

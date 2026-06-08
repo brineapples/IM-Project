@@ -5,7 +5,15 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+// -----------------------------
+// Authentication Check
+// -----------------------------
+
 requireAdminArea();
+
+// -----------------------------
+// Dashboard Counts
+// -----------------------------
 
 $counts = [
     'sessions' => (int) db()->query('SELECT COUNT(*) FROM `SESSION`')->fetchColumn(),
@@ -15,13 +23,17 @@ $counts = [
     'logs' => (int) db()->query('SELECT COUNT(*) FROM ACTIVITY_LOG')->fetchColumn(),
 ];
 
+// -----------------------------
+// HTML Output
+// -----------------------------
+
 renderAdminHeader('Dashboard', 'dashboard');
 ?>
 <section class="section app-section">
     <div class="app-panel">
         <div class="app-heading">
             <div>
-                <h1>Admin <em>Dashboard</em></h1>
+                <h1>ILHF <em>ZEST Dashboard</em></h1>
                 <p class="app-muted mb-0">Management area for staff and administrators.</p>
             </div>
         </div>

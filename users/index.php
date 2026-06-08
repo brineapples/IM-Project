@@ -5,14 +5,26 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+// -----------------------------
+// Authentication Check
+// -----------------------------
+
 requireAdminArea();
 requirePermission('USER_ACCOUNT', 'READ');
+
+// -----------------------------
+// Form Defaults
+// -----------------------------
 
 $errors = [];
 $username = trim($_POST['username'] ?? '');
 $roleId = (int) ($_POST['role_id'] ?? 0);
 
 $roles = db()->query('SELECT role_id, role_name FROM ROLE ORDER BY role_name')->fetchAll();
+
+// -----------------------------
+// Form Handling
+// -----------------------------
 
 if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     requirePermission('USER_ACCOUNT', 'CREATE');
@@ -42,6 +54,10 @@ if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     }
 }
 
+// -----------------------------
+// Database Queries
+// -----------------------------
+
 $stmt = db()->query(
     'SELECT ua.user_id, ua.username, ua.role_id, r.role_name
      FROM USER_ACCOUNT ua
@@ -49,6 +65,10 @@ $stmt = db()->query(
      ORDER BY ua.username'
 );
 $users = $stmt->fetchAll();
+
+// -----------------------------
+// HTML Output
+// -----------------------------
 
 renderAdminHeader('Users', 'users');
 ?>
@@ -62,8 +82,8 @@ renderAdminHeader('Users', 'users');
                 </div>
             </div>
 
-            <div class="table-responsive">
-                <table class="table table-hover">
+            <div class="table-responsive responsive-table-stack">
+                <table class="table table-hover responsive-stack-table">
                     <thead>
                         <tr>
                             <th>Username</th>
@@ -74,9 +94,9 @@ renderAdminHeader('Users', 'users');
                     <tbody>
                         <?php foreach ($users as $account): ?>
                             <tr>
-                                <td><?= e($account['username']) ?></td>
-                                <td><?= e(displayRoleName($account['role_name'])) ?></td>
-                                <td>
+                                <td data-label="Username"><?= e($account['username']) ?></td>
+                                <td data-label="Role"><?= e(displayRoleName($account['role_name'])) ?></td>
+                                <td data-label="Change Role">
                                     <?php if (hasPermission('USER_ACCOUNT', 'UPDATE')): ?>
                                         <form class="role-select-form" method="post" action="<?= e(url('users/update_role.php')) ?>">
                                             <input type="hidden" name="user_id" value="<?= e((string) $account['user_id']) ?>">

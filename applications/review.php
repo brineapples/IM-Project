@@ -4,9 +4,17 @@ declare(strict_types=1);
 
 require_once __DIR__ . '/../includes/helpers.php';
 
+// -----------------------------
+// Authentication Check
+// -----------------------------
+
 requireAdminArea();
 requirePermission('APPLICATION', 'UPDATE');
 requirePost();
+
+// -----------------------------
+// Request Data
+// -----------------------------
 
 $applicationId = (int) ($_POST['application_id'] ?? 0);
 $decision = $_POST['decision'] ?? '';
@@ -16,6 +24,10 @@ if (!$user || !in_array($decision, ['approve', 'reject'], true)) {
     flash('danger', 'Invalid application review request.');
     redirect('applications/index.php');
 }
+
+// -----------------------------
+// Review Transaction
+// -----------------------------
 
 db()->beginTransaction();
 

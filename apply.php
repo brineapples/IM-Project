@@ -5,15 +5,27 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/includes/layout.php';
 
+// -----------------------------
+// Page Setup
+// -----------------------------
+
 if (userCount() === 0) {
     redirect('setup.php');
 }
+
+// -----------------------------
+// Lookup Data
+// -----------------------------
 
 $barangays = getBarangayOptions();
 $chapters = db()->query('SELECT chapter_id, chapter_name FROM CHAPTER ORDER BY chapter_name')->fetchAll();
 $genders = db()->query('SELECT gender_id, gender_name FROM GENDER ORDER BY gender_name')->fetchAll();
 $memberStatuses = db()->query('SELECT member_status_id, status_name FROM MEMBER_STATUS ORDER BY status_name')->fetchAll();
 $educationLevels = db()->query('SELECT educational_attainment_id, level_name FROM EDUCATIONAL_ATTAINMENT ORDER BY level_name')->fetchAll();
+
+// -----------------------------
+// Form Defaults
+// -----------------------------
 
 $fields = [
     'desired_username' => '',
@@ -41,6 +53,10 @@ foreach ($fields as $field => $default) {
 }
 
 $errors = [];
+
+// -----------------------------
+// Validation Helpers
+// -----------------------------
 
 function lookupHasId(string $table, string $idColumn, int $id): bool
 {
@@ -81,6 +97,10 @@ function optionalYearValue(string $value, array &$errors, string $label): ?int
 
     return $year;
 }
+
+// -----------------------------
+// Form Handling
+// -----------------------------
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
@@ -190,6 +210,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('apply.php');
     }
 }
+
+// -----------------------------
+// HTML Output
+// -----------------------------
 
 renderPublicHeader('Apply for Membership', 'apply');
 ?>

@@ -5,6 +5,10 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/includes/layout.php';
 
+// -----------------------------
+// Page Setup
+// -----------------------------
+
 if (userCount() === 0) {
     redirect('setup.php');
 }
@@ -15,6 +19,10 @@ if (isLoggedIn()) {
 
 $errors = [];
 $username = trim($_POST['username'] ?? '');
+
+// -----------------------------
+// Form Handling
+// -----------------------------
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
@@ -39,13 +47,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $errors[] = 'Invalid username or password.';
 }
 
+// -----------------------------
+// HTML Output
+// -----------------------------
+
 renderPublicHeader('Login', 'login');
 ?>
 <section class="section app-section">
     <div class="container">
         <div class="app-panel login-panel">
             <div class="app-heading">
-                <h1>ZEST <em>Login</em></h1>
+                <h1>ILHF <em>Login</em></h1>
             </div>
 
             <?php if ($errors): ?>

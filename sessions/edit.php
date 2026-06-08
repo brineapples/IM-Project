@@ -5,8 +5,16 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+// -----------------------------
+// Authentication Check
+// -----------------------------
+
 requireAdminArea();
 requirePermission('SESSION', 'UPDATE');
+
+// -----------------------------
+// Database Queries
+// -----------------------------
 
 $sessionId = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
 $stmt = db()->prepare('SELECT * FROM `SESSION` WHERE session_id = ?');
@@ -20,6 +28,10 @@ if (!$session) {
 
 $errors = [];
 $coaches = getCoaches();
+
+// -----------------------------
+// Form Handling
+// -----------------------------
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $session = [
@@ -74,6 +86,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('sessions/view.php?id=' . $sessionId);
     }
 }
+
+// -----------------------------
+// HTML Output
+// -----------------------------
 
 renderAdminHeader('Edit Session', 'sessions');
 ?>

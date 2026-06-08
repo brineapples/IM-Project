@@ -3,7 +3,9 @@
 	"use strict";
 
 	$(function() {
-        $("#tabs").tabs();
+        if ($.fn.tabs && $("#tabs").length) {
+            $("#tabs").tabs();
+        }
     });
 
 	$(window).scroll(function() {

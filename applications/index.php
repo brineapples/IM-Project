@@ -5,8 +5,16 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+// -----------------------------
+// Authentication Check
+// -----------------------------
+
 requireAdminArea();
 requirePermission('APPLICATION', 'READ');
+
+// -----------------------------
+// Filter Preparation
+// -----------------------------
 
 $statuses = db()->query('SELECT application_status_id, status_name FROM APPLICATION_STATUS ORDER BY FIELD(status_name, "Pending", "Approved", "Rejected"), status_name')->fetchAll();
 $pendingStatusId = getApplicationStatusId('Pending');
@@ -19,6 +27,10 @@ if ($statusId > 0) {
     $params[] = $statusId;
 }
 
+// -----------------------------
+// Database Queries
+// -----------------------------
+
 $stmt = db()->prepare(
     'SELECT ma.application_id, ma.desired_username, ma.first_name, ma.middle_name, ma.last_name,
             ma.birthday, ma.barangay_id, ma.created_at, aps.status_name
@@ -29,6 +41,10 @@ $stmt = db()->prepare(
 );
 $stmt->execute($params);
 $applications = $stmt->fetchAll();
+
+// -----------------------------
+// HTML Output
+// -----------------------------
 
 renderAdminHeader('Applications', 'applications');
 ?>
@@ -69,7 +85,7 @@ renderAdminHeader('Applications', 'applications');
                                     <?= e($application['status_name']) ?>
                                 </span>
                                 <h2><?= e(trim($application['first_name'] . ' ' . ($application['middle_name'] ?? '') . ' ' . $application['last_name'])) ?></h2>
-                                <p class="app-muted mb-0">Application #<?= e((string) $application['application_id']) ?> · <?= e($application['desired_username']) ?></p>
+                                <p class="app-muted mb-0">Application #<?= e((string) $application['application_id']) ?> &middot; <?= e($application['desired_username']) ?></p>
                             </div>
                             <div class="application-card-meta">
                                 <span>Barangay: <?= e(barangayName((int) $application['barangay_id'])) ?></span>

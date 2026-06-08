@@ -5,9 +5,17 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+// -----------------------------
+// Authentication Check
+// -----------------------------
+
 requireAdminArea();
 requirePermission('SESSION', 'READ');
 refreshSessionStatuses();
+
+// -----------------------------
+// Database Queries
+// -----------------------------
 
 $sessionId = (int) ($_GET['id'] ?? 0);
 $stmt = db()->prepare(
@@ -26,6 +34,10 @@ if (!$session) {
     flash('danger', 'Session not found.');
     redirect('sessions/index.php');
 }
+
+// -----------------------------
+// HTML Output
+// -----------------------------
 
 renderAdminHeader('View Session', 'sessions');
 ?>

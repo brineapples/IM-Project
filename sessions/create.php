@@ -5,8 +5,16 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+// -----------------------------
+// Authentication Check
+// -----------------------------
+
 requireAdminArea();
 requirePermission('SESSION', 'CREATE');
+
+// -----------------------------
+// Form Defaults
+// -----------------------------
 
 $errors = [];
 $session = [
@@ -18,6 +26,10 @@ $session = [
     'coach_user_id' => (int) ($_POST['coach_user_id'] ?? 0),
 ];
 $coaches = getCoaches();
+
+// -----------------------------
+// Form Handling
+// -----------------------------
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if ($session['session_title'] === '') {
@@ -60,6 +72,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         redirect('sessions/index.php');
     }
 }
+
+// -----------------------------
+// HTML Output
+// -----------------------------
 
 renderAdminHeader('Create Session', 'sessions');
 ?>

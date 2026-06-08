@@ -10,6 +10,10 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+// -----------------------------
+// Basic Output and URL Helpers
+// -----------------------------
+
 function e(?string $value): string
 {
     return htmlspecialchars((string) $value, ENT_QUOTES, 'UTF-8');
@@ -46,6 +50,10 @@ function consumeFlash(): array
     unset($_SESSION['flash']);
     return $messages;
 }
+
+// -----------------------------
+// Authentication Helpers
+// -----------------------------
 
 function currentUser(): ?array
 {
@@ -94,6 +102,10 @@ function displayRoleName(string $roleName): string
     return $roleName === 'Instructor' ? 'Coach' : $roleName;
 }
 
+// -----------------------------
+// Barangay Helpers
+// -----------------------------
+
 function getBarangayOptions(): array
 {
     return [
@@ -141,6 +153,10 @@ function barangayName(?int $barangayId): string
 
     return getBarangayOptions()[$barangayId] ?? 'Unknown barangay';
 }
+
+// -----------------------------
+// Permission Helpers
+// -----------------------------
 
 function hasPermission(string $moduleName, string $actionName, ?int $userId = null): bool
 {
@@ -252,6 +268,10 @@ function requireSuperAdmin(): void
     }
 }
 
+// -----------------------------
+// Activity Log Helpers
+// -----------------------------
+
 function logActivity(?int $userId, string $action, string $description): void
 {
     $stmt = db()->prepare(
@@ -302,6 +322,10 @@ function requirePost(): void
         exit('Method not allowed.');
     }
 }
+
+// -----------------------------
+// Session and Lookup Helpers
+// -----------------------------
 
 function getCoaches(): array
 {
@@ -396,6 +420,10 @@ function calculateAge(string $birthday): int
 
     return $birthDate->diff($today)->y;
 }
+
+// -----------------------------
+// Setup Helpers
+// -----------------------------
 
 function userCount(): int
 {

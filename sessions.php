@@ -5,11 +5,19 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/includes/layout.php';
 
+// -----------------------------
+// Page Setup
+// -----------------------------
+
 if (userCount() === 0) {
     redirect('setup.php');
 }
 
 refreshSessionStatuses();
+
+// -----------------------------
+// Filter Preparation
+// -----------------------------
 
 $statuses = getSessionStatuses();
 $incomingStatusId = 0;
@@ -33,6 +41,10 @@ if ($statusId > 0) {
 $whereSql = $where ? ' WHERE ' . implode(' AND ', $where) : '';
 $orderDirection = strtoupper($sort);
 
+// -----------------------------
+// Database Queries
+// -----------------------------
+
 $stmt = db()->prepare(
     'SELECT s.session_title, s.session_date, s.start_time, s.end_time, s.location,
             ua.username AS coach_username,
@@ -46,6 +58,10 @@ $stmt = db()->prepare(
 $stmt->execute($params);
 $sessions = $stmt->fetchAll();
 
+// -----------------------------
+// HTML Output
+// -----------------------------
+
 renderPublicHeader('Sessions', 'sessions');
 ?>
 <section class="section app-section">
@@ -53,7 +69,7 @@ renderPublicHeader('Sessions', 'sessions');
         <div class="app-panel">
             <div class="app-heading">
                 <div>
-                    <h1>Zumba <em>Sessions</em></h1>
+                    <h1>ILHF <em>ZEST Sessions</em></h1>
                     <p class="app-muted mb-0">View scheduled Zumba sessions for ILHF Santo Nino Chapter.</p>
                 </div>
             </div>
