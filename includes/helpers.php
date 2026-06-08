@@ -197,6 +197,36 @@ function requirePermission(string $moduleName, string $actionName): void
     }
 }
 
+function userCanAccessAdminArea(?int $userId = null): bool
+{
+    $user = $userId === null ? currentUser() : null;
+    if ($userId === null && $user === null) {
+        return false;
+    }
+
+    $userId = $userId ?? (int) $user['user_id'];
+
+    return hasPermission('SESSION', 'CREATE', $userId)
+        || hasPermission('SESSION', 'UPDATE', $userId)
+        || hasPermission('SESSION', 'DELETE', $userId)
+        || hasPermission('APPLICATION', 'READ', $userId)
+        || hasPermission('USER_ACCOUNT', 'READ', $userId)
+        || hasPermission('ROLE', 'READ', $userId)
+        || hasPermission('PERMISSION', 'READ', $userId)
+        || hasPermission('ACTIVITY_LOG', 'READ', $userId);
+}
+
+function requireAdminArea(): void
+{
+    requireLogin();
+
+    if (!userCanAccessAdminArea()) {
+        logCurrentUserActivity('PERMISSION_DENIED', 'User attempted to open the admin area without admin permissions.');
+        flash('warning', 'You do not have access to the admin area.');
+        redirect('sessions.php');
+    }
+}
+
 function requireSuperAdmin(): void
 {
     requireLogin();

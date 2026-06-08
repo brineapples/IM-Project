@@ -5,7 +5,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
-requirePermission('USER_ACCOUNT', 'VIEW');
+requireAdminArea();
+requirePermission('USER_ACCOUNT', 'READ');
 
 $errors = [];
 $username = trim($_POST['username'] ?? '');
@@ -13,7 +14,7 @@ $roleId = (int) ($_POST['role_id'] ?? 0);
 
 $roles = db()->query('SELECT role_id, role_name FROM ROLE ORDER BY role_name')->fetchAll();
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     requirePermission('USER_ACCOUNT', 'CREATE');
     $password = $_POST['password'] ?? '';
 
@@ -49,7 +50,7 @@ $stmt = db()->query(
 );
 $users = $stmt->fetchAll();
 
-renderHeader('Users', 'users');
+renderAdminHeader('Users', 'users');
 ?>
 <section class="section app-section">
     <div class="container">
@@ -57,47 +58,10 @@ renderHeader('Users', 'users');
             <div class="app-heading">
                 <div>
                     <h1>User <em>Accounts</em></h1>
-                    <p class="app-muted mb-0">Create accounts and assign their role.</p>
+                    <p class="app-muted mb-0">Review accounts and change roles.</p>
                 </div>
             </div>
 
-            <?php if ($errors): ?>
-                <div class="alert alert-danger">
-                    <?php foreach ($errors as $error): ?>
-                        <div><?= e($error) ?></div>
-                    <?php endforeach; ?>
-                </div>
-            <?php endif; ?>
-
-            <?php if (hasPermission('USER_ACCOUNT', 'CREATE')): ?>
-                <form method="post">
-                    <div class="form-row">
-                        <div class="form-group col-md-4">
-                            <label for="username">Username</label>
-                            <input class="form-control" id="username" name="username" value="<?= e($username) ?>" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="password">Password</label>
-                            <input class="form-control" id="password" type="password" name="password" required>
-                        </div>
-                        <div class="form-group col-md-4">
-                            <label for="role_id">Role</label>
-                            <select class="form-control" id="role_id" name="role_id" required>
-                                <option value="">Select role</option>
-                                <?php foreach ($roles as $role): ?>
-                                    <option value="<?= e((string) $role['role_id']) ?>" <?= $roleId === (int) $role['role_id'] ? 'selected' : '' ?>>
-                                        <?= e(displayRoleName($role['role_name'])) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </div>
-                    </div>
-                    <button class="btn btn-primary" type="submit">Create User</button>
-                </form>
-            <?php endif; ?>
-        </div>
-
-        <div class="app-panel">
             <div class="table-responsive">
                 <table class="table table-hover">
                     <thead>
@@ -114,16 +78,15 @@ renderHeader('Users', 'users');
                                 <td><?= e(displayRoleName($account['role_name'])) ?></td>
                                 <td>
                                     <?php if (hasPermission('USER_ACCOUNT', 'UPDATE')): ?>
-                                        <form class="form-inline" method="post" action="<?= e(url('users/update_role.php')) ?>">
+                                        <form class="role-select-form" method="post" action="<?= e(url('users/update_role.php')) ?>">
                                             <input type="hidden" name="user_id" value="<?= e((string) $account['user_id']) ?>">
-                                            <select class="form-control form-control-sm mr-2" name="role_id">
+                                            <select class="form-control form-control-sm" name="role_id" aria-label="Change role for <?= e($account['username']) ?>">
                                                 <?php foreach ($roles as $role): ?>
                                                     <option value="<?= e((string) $role['role_id']) ?>" <?= (int) $account['role_id'] === (int) $role['role_id'] ? 'selected' : '' ?>>
                                                         <?= e(displayRoleName($role['role_name'])) ?>
                                                     </option>
                                                 <?php endforeach; ?>
                                             </select>
-                                            <button class="btn btn-sm btn-outline-primary" type="submit">Save</button>
                                         </form>
                                     <?php else: ?>
                                         <span class="app-muted">No permission</span>
@@ -135,6 +98,57 @@ renderHeader('Users', 'users');
                 </table>
             </div>
         </div>
+
+        <?php if (hasPermission('USER_ACCOUNT', 'CREATE')): ?>
+        <div class="app-panel">
+            <div class="app-heading">
+                <div>
+                    <h2>Create <em>User</em></h2>
+                    <p class="app-muted mb-0">Add a new login account after reviewing existing users.</p>
+                </div>
+            </div>
+
+            <?php if ($errors): ?>
+                <div class="alert alert-danger">
+                    <?php foreach ($errors as $error): ?>
+                        <div><?= e($error) ?></div>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+
+            <form method="post">
+                <div class="form-row">
+                    <div class="form-group col-md-4">
+                        <label for="username">Username</label>
+                        <input class="form-control" id="username" name="username" value="<?= e($username) ?>" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="password">Password</label>
+                        <input class="form-control" id="password" type="password" name="password" required>
+                    </div>
+                    <div class="form-group col-md-4">
+                        <label for="role_id">Role</label>
+                        <select class="form-control" id="role_id" name="role_id" required>
+                            <option value="">Select role</option>
+                            <?php foreach ($roles as $role): ?>
+                                <option value="<?= e((string) $role['role_id']) ?>" <?= $roleId === (int) $role['role_id'] ? 'selected' : '' ?>>
+                                    <?= e(displayRoleName($role['role_name'])) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                    </div>
+                </div>
+                <button class="btn btn-primary" type="submit">Create User</button>
+            </form>
+        </div>
+        <?php endif; ?>
     </div>
 </section>
+<script>
+document.querySelectorAll('.role-select-form select').forEach(function (select) {
+    select.addEventListener('change', function () {
+        this.form.submit();
+    });
+});
+</script>
 <?php renderFooter(); ?>

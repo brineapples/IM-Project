@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+requireAdminArea();
 requirePermission('APPLICATION', 'READ');
 
 $applicationId = (int) ($_GET['id'] ?? 0);
@@ -31,7 +32,7 @@ if (!$application) {
 
 $isPending = $application['application_status_name'] === 'Pending';
 
-renderHeader('Application Details', 'applications');
+renderAdminHeader('Application Details', 'applications');
 ?>
 <section class="section app-section">
     <div class="container">

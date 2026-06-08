@@ -191,7 +191,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-renderHeader('Apply for Membership', 'apply');
+renderPublicHeader('Apply for Membership', 'apply');
 ?>
 <section class="section app-section">
     <div class="container">

@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+requireAdminArea();
 requirePermission('SESSION', 'CREATE');
 
 $errors = [];
@@ -60,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-renderHeader('Create Session', 'sessions');
+renderAdminHeader('Create Session', 'sessions');
 ?>
 <section class="section app-section">
     <div class="container">

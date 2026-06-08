@@ -9,10 +9,10 @@ if (userCount() === 0) {
     redirect('setup.php');
 }
 
-$ctaPath = isLoggedIn() ? 'sessions/index.php' : 'apply.php';
+$ctaPath = isLoggedIn() ? 'sessions.php' : 'apply.php';
 $ctaText = isLoggedIn() ? 'View Sessions' : 'Apply Now';
 
-renderHeader('Home');
+renderPublicHeader('Home', 'home');
 ?>
 <section class="landing-hero">
     <video autoplay muted loop playsinline>
@@ -59,21 +59,22 @@ renderHeader('Home');
         <div class="landing-coach-grid">
             <article class="landing-coach-card">
                 <img src="<?= e(asset('images/first-trainer.jpg')) ?>" alt="">
-                <span>Lorem Ipsum</span>
-                <h2>Dolor Sit</h2>
-                <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae libero sed arcu facilisis gravida.</p>
+                <span>Chapter President</span>
+                <h2>Anabelle Reloj</h2>
+                <div class="landing-coach-links">
+                    <a href="#" aria-label="Anabelle Reloj Facebook link placeholder">Facebook</a>
+                    <a href="#" aria-label="Anabelle Reloj Messenger link placeholder">Messenger</a>
+                </div>
             </article>
             <article class="landing-coach-card">
                 <img src="<?= e(asset('images/second-trainer.jpg')) ?>" alt="">
                 <span>Consectetur</span>
                 <h2>Amet Elit</h2>
-                <p>Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Vestibulum ante ipsum primis.</p>
             </article>
             <article class="landing-coach-card">
                 <img src="<?= e(asset('images/third-trainer.jpg')) ?>" alt="">
                 <span>Adipiscing</span>
                 <h2>Tempor Incididunt</h2>
-                <p>Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo.</p>
             </article>
         </div>
     </div>

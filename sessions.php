@@ -2,11 +2,13 @@
 
 declare(strict_types=1);
 
-require_once __DIR__ . '/../includes/helpers.php';
-require_once __DIR__ . '/../includes/layout.php';
+require_once __DIR__ . '/includes/helpers.php';
+require_once __DIR__ . '/includes/layout.php';
 
-requireAdminArea();
-requirePermission('SESSION', 'READ');
+if (userCount() === 0) {
+    redirect('setup.php');
+}
+
 refreshSessionStatuses();
 
 $statuses = getSessionStatuses();
@@ -32,7 +34,7 @@ $whereSql = $where ? ' WHERE ' . implode(' AND ', $where) : '';
 $orderDirection = strtoupper($sort);
 
 $stmt = db()->prepare(
-    'SELECT s.session_id, s.session_title, s.session_date, s.start_time, s.end_time, s.location,
+    'SELECT s.session_title, s.session_date, s.start_time, s.end_time, s.location,
             ua.username AS coach_username,
             ss.status_name
      FROM `SESSION` s
@@ -44,22 +46,19 @@ $stmt = db()->prepare(
 $stmt->execute($params);
 $sessions = $stmt->fetchAll();
 
-renderAdminHeader('Manage Sessions', 'sessions');
+renderPublicHeader('Sessions', 'sessions');
 ?>
 <section class="section app-section">
     <div class="container">
         <div class="app-panel">
             <div class="app-heading">
                 <div>
-                    <h1>Manage <em>Sessions</em></h1>
-                    <p class="app-muted mb-0">Zumba Event Scheduling Tracker for ILHF Santo Nino Chapter.</p>
+                    <h1>Zumba <em>Sessions</em></h1>
+                    <p class="app-muted mb-0">View scheduled Zumba sessions for ILHF Santo Nino Chapter.</p>
                 </div>
-                <?php if (hasPermission('SESSION', 'CREATE')): ?>
-                    <a class="btn btn-primary" href="<?= e(url('sessions/create.php')) ?>">Create Session</a>
-                <?php endif; ?>
             </div>
 
-            <form class="session-filter" id="session-filter-form" method="get">
+            <form class="session-filter" id="public-session-filter-form" method="get">
                 <div class="form-row">
                     <div class="form-group col-md-6">
                         <label for="status_id">Status</label>
@@ -87,7 +86,7 @@ renderAdminHeader('Manage Sessions', 'sessions');
             <?php else: ?>
                 <div class="session-card-grid">
                     <?php foreach ($sessions as $session): ?>
-                        <a class="session-card session-card-<?= e(strtolower(str_replace(' ', '-', $session['status_name']))) ?>" href="<?= e(url('sessions/view.php?id=' . $session['session_id'])) ?>">
+                        <article class="session-card session-card-<?= e(strtolower(str_replace(' ', '-', $session['status_name']))) ?>">
                             <div class="session-card-date">
                                 <span><?= e(date('M', strtotime($session['session_date']))) ?></span>
                                 <strong><?= e(date('d', strtotime($session['session_date']))) ?></strong>
@@ -102,9 +101,8 @@ renderAdminHeader('Manage Sessions', 'sessions');
                                     <span><?= e($session['location']) ?></span>
                                     <span>Coach: <?= e($session['coach_username']) ?></span>
                                 </div>
-                                <span class="session-card-link-text">Open Session</span>
                             </div>
-                        </a>
+                        </article>
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
@@ -114,7 +112,7 @@ renderAdminHeader('Manage Sessions', 'sessions');
 <script>
 document.querySelectorAll('.js-auto-submit').forEach(function (select) {
     select.addEventListener('change', function () {
-        document.getElementById('session-filter-form').submit();
+        document.getElementById('public-session-filter-form').submit();
     });
 });
 </script>

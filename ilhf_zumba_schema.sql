@@ -276,8 +276,7 @@ INSERT INTO `ACTION_TYPE` (`action_name`) VALUES
     ('CREATE'),
     ('READ'),
     ('UPDATE'),
-    ('DELETE'),
-    ('VIEW');
+    ('DELETE');
 
 INSERT INTO `MODULE` (`module_name`) VALUES
     ('USER_ACCOUNT'),
@@ -310,7 +309,7 @@ INNER JOIN `MODULE` ON `MODULE`.`module_id` = `PERMISSION`.`module_id`
 INNER JOIN `ACTION_TYPE` ON `ACTION_TYPE`.`action_type_id` = `PERMISSION`.`action_type_id`
 WHERE `ROLE`.`role_name` = 'Admin'
   AND `MODULE`.`module_name` = 'APPLICATION'
-  AND `ACTION_TYPE`.`action_name` IN ('READ', 'UPDATE', 'VIEW');
+  AND `ACTION_TYPE`.`action_name` IN ('READ', 'UPDATE');
 
 INSERT INTO `CHAPTER` (`chapter_name`) VALUES
     ('Santo Niño Chapter');

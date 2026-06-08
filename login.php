@@ -10,7 +10,7 @@ if (userCount() === 0) {
 }
 
 if (isLoggedIn()) {
-    redirect('sessions/index.php');
+    redirect(userCanAccessAdminArea() ? 'admin/dashboard.php' : 'sessions.php');
 }
 
 $errors = [];
@@ -32,14 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         session_regenerate_id(true);
         $_SESSION['user_id'] = (int) $user['user_id'];
         logActivity((int) $user['user_id'], 'LOGIN_SUCCESS', 'User ' . $user['username'] . ' logged in successfully.');
-        redirect('sessions/index.php');
+        redirect(userCanAccessAdminArea((int) $user['user_id']) ? 'admin/dashboard.php' : 'sessions.php');
     }
 
     logFailedLogin($username, $user ? (int) $user['user_id'] : null);
     $errors[] = 'Invalid username or password.';
 }
 
-renderHeader('Login', 'login');
+renderPublicHeader('Login', 'login');
 ?>
 <section class="section app-section">
     <div class="container">

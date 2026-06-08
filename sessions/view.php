@@ -5,7 +5,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
-requirePermission('SESSION', 'VIEW');
+requireAdminArea();
+requirePermission('SESSION', 'READ');
 refreshSessionStatuses();
 
 $sessionId = (int) ($_GET['id'] ?? 0);
@@ -26,7 +27,7 @@ if (!$session) {
     redirect('sessions/index.php');
 }
 
-renderHeader('View Session', 'sessions');
+renderAdminHeader('View Session', 'sessions');
 ?>
 <section class="section app-section">
     <div class="container">

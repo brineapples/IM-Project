@@ -48,7 +48,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-renderHeader('First Setup', 'login');
+renderPublicHeader('First Setup', 'login');
 ?>
 <section class="section app-section">
     <div class="container">

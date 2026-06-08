@@ -5,7 +5,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/includes/helpers.php';
 require_once __DIR__ . '/includes/layout.php';
 
-requirePermission('ACTIVITY_LOG', 'VIEW');
+requireAdminArea();
+requirePermission('ACTIVITY_LOG', 'READ');
 
 $stmt = db()->query(
     'SELECT al.log_id, al.action, al.description, al.log_date, ua.username
@@ -16,7 +17,7 @@ $stmt = db()->query(
 );
 $logs = $stmt->fetchAll();
 
-renderHeader('Activity Logs', 'logs');
+renderAdminHeader('Activity Logs', 'logs');
 ?>
 <section class="section app-section">
     <div class="container">

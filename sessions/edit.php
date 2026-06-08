@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+requireAdminArea();
 requirePermission('SESSION', 'UPDATE');
 
 $sessionId = (int) ($_GET['id'] ?? $_POST['id'] ?? 0);
@@ -74,7 +75,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-renderHeader('Edit Session', 'sessions');
+renderAdminHeader('Edit Session', 'sessions');
 ?>
 <section class="section app-section">
     <div class="container">

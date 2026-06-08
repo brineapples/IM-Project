@@ -5,7 +5,8 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
-requirePermission('APPLICATION', 'VIEW');
+requireAdminArea();
+requirePermission('APPLICATION', 'READ');
 
 $statuses = db()->query('SELECT application_status_id, status_name FROM APPLICATION_STATUS ORDER BY FIELD(status_name, "Pending", "Approved", "Rejected"), status_name')->fetchAll();
 $pendingStatusId = getApplicationStatusId('Pending');
@@ -29,7 +30,7 @@ $stmt = db()->prepare(
 $stmt->execute($params);
 $applications = $stmt->fetchAll();
 
-renderHeader('Applications', 'applications');
+renderAdminHeader('Applications', 'applications');
 ?>
 <section class="section app-section">
     <div class="container">

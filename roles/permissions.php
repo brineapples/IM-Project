@@ -5,6 +5,7 @@ declare(strict_types=1);
 require_once __DIR__ . '/../includes/helpers.php';
 require_once __DIR__ . '/../includes/layout.php';
 
+requireAdminArea();
 requireSuperAdmin();
 
 $roleId = (int) ($_GET['id'] ?? $_POST['role_id'] ?? 0);
@@ -17,8 +18,53 @@ if (!$role) {
     redirect('roles/index.php');
 }
 
-$modules = db()->query('SELECT module_id, module_name FROM MODULE ORDER BY module_name')->fetchAll();
-$actions = db()->query('SELECT action_type_id, action_name FROM ACTION_TYPE ORDER BY FIELD(action_name, "CREATE", "READ", "UPDATE", "DELETE", "VIEW"), action_name')->fetchAll();
+$featureDefinitions = [
+    'SESSION' => [
+        'label' => 'Sessions',
+        'description' => 'Create, read, edit, and delete scheduled Zumba sessions.',
+        'actions' => ['CREATE', 'READ', 'UPDATE', 'DELETE'],
+    ],
+    'APPLICATION' => [
+        'label' => 'Applications',
+        'description' => 'Review membership applications and approve or reject applicants.',
+        'actions' => ['READ', 'UPDATE'],
+    ],
+    'USER_ACCOUNT' => [
+        'label' => 'User Accounts',
+        'description' => 'Create accounts and assign user roles.',
+        'actions' => ['CREATE', 'READ', 'UPDATE'],
+    ],
+    'ROLE' => [
+        'label' => 'Roles',
+        'description' => 'Create and delete system roles.',
+        'actions' => ['CREATE', 'READ', 'DELETE'],
+    ],
+    'PERMISSION' => [
+        'label' => 'Role Permissions',
+        'description' => 'Assign allowed actions to each role.',
+        'actions' => ['READ', 'UPDATE'],
+    ],
+    'ACTIVITY_LOG' => [
+        'label' => 'Activity Logs',
+        'description' => 'View the central audit trail.',
+        'actions' => ['READ'],
+    ],
+];
+
+$allModules = db()->query('SELECT module_id, module_name FROM MODULE ORDER BY module_name')->fetchAll();
+$moduleLookup = [];
+foreach ($allModules as $module) {
+    $moduleLookup[$module['module_name']] = $module;
+}
+
+$modules = [];
+foreach (array_keys($featureDefinitions) as $moduleName) {
+    if (isset($moduleLookup[$moduleName])) {
+        $modules[] = $moduleLookup[$moduleName];
+    }
+}
+
+$actions = db()->query('SELECT action_type_id, action_name FROM ACTION_TYPE ORDER BY FIELD(action_name, "CREATE", "READ", "UPDATE", "DELETE"), action_name')->fetchAll();
 $permissions = db()->query(
     'SELECT p.permission_id, p.module_id, p.action_type_id
      FROM PERMISSION p'
@@ -29,14 +75,31 @@ foreach ($permissions as $permission) {
     $permissionLookup[$permission['module_id']][$permission['action_type_id']] = (int) $permission['permission_id'];
 }
 
+$visiblePermissionIds = [];
+foreach ($modules as $module) {
+    $featureActions = $featureDefinitions[$module['module_name']]['actions'];
+    foreach ($actions as $action) {
+        if (!in_array($action['action_name'], $featureActions, true)) {
+            continue;
+        }
+
+        $permissionId = $permissionLookup[$module['module_id']][$action['action_type_id']] ?? null;
+        if ($permissionId) {
+            $visiblePermissionIds[] = $permissionId;
+        }
+    }
+}
+
 $stmt = db()->prepare('SELECT permission_id FROM ROLE_PERMISSION WHERE role_id = ?');
 $stmt->execute([$roleId]);
 $currentPermissionIds = array_map('intval', $stmt->fetchAll(PDO::FETCH_COLUMN));
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+if (($_SERVER['REQUEST_METHOD'] ?? 'GET') === 'POST') {
     $selectedPermissionIds = array_map('intval', $_POST['permissions'] ?? []);
+    $selectedPermissionIds = array_values(array_intersect($selectedPermissionIds, $visiblePermissionIds));
+    $currentVisiblePermissionIds = array_values(array_intersect($currentPermissionIds, $visiblePermissionIds));
     $toAdd = array_values(array_diff($selectedPermissionIds, $currentPermissionIds));
-    $toRemove = array_values(array_diff($currentPermissionIds, $selectedPermissionIds));
+    $toRemove = array_values(array_diff($currentVisiblePermissionIds, $selectedPermissionIds));
 
     db()->beginTransaction();
     try {
@@ -65,7 +128,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 }
 
-renderHeader('Role Permissions', 'roles');
+renderAdminHeader('Role Permissions', 'roles');
 ?>
 <section class="section app-section">
     <div class="container">
@@ -78,39 +141,38 @@ renderHeader('Role Permissions', 'roles');
                 <a class="btn btn-outline-secondary" href="<?= e(url('roles/index.php')) ?>">Back</a>
             </div>
 
-            <form method="post">
+            <form id="role-permissions-form" method="post">
                 <input type="hidden" name="role_id" value="<?= e((string) $roleId) ?>">
-                <div class="table-responsive">
-                    <table class="table table-bordered permission-grid">
-                        <thead>
-                            <tr>
-                                <th>Module</th>
+                <div class="permission-feature-grid">
+                    <?php foreach ($modules as $module): ?>
+                        <?php $feature = $featureDefinitions[$module['module_name']]; ?>
+                        <section class="permission-feature-card">
+                            <div class="permission-feature-heading">
+                                <div>
+                                    <h2><?= e($feature['label']) ?></h2>
+                                    <p><?= e($feature['description']) ?></p>
+                                </div>
+                            </div>
+
+                            <div class="permission-action-grid">
                                 <?php foreach ($actions as $action): ?>
-                                    <th><?= e($action['action_name']) ?></th>
+                                    <?php if (!in_array($action['action_name'], $feature['actions'], true)) { continue; } ?>
+                                    <?php $permissionId = $permissionLookup[$module['module_id']][$action['action_type_id']] ?? null; ?>
+                                    <?php if ($permissionId): ?>
+                                        <label class="permission-action-option">
+                                            <input type="checkbox" name="permissions[]" value="<?= e((string) $permissionId) ?>" <?= in_array($permissionId, $currentPermissionIds, true) ? 'checked="checked"' : '' ?>>
+                                            <span><?= e($action['action_name']) ?></span>
+                                        </label>
+                                    <?php endif; ?>
                                 <?php endforeach; ?>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php foreach ($modules as $module): ?>
-                                <tr>
-                                    <td><?= e($module['module_name']) ?></td>
-                                    <?php foreach ($actions as $action): ?>
-                                        <?php $permissionId = $permissionLookup[$module['module_id']][$action['action_type_id']] ?? null; ?>
-                                        <td>
-                                            <?php if ($permissionId): ?>
-                                                <input type="checkbox" name="permissions[]" value="<?= e((string) $permissionId) ?>" <?= in_array($permissionId, $currentPermissionIds, true) ? 'checked="checked"' : '' ?>>
-                                            <?php else: ?>
-                                                -
-                                            <?php endif; ?>
-                                        </td>
-                                    <?php endforeach; ?>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
+                            </div>
+                        </section>
+                    <?php endforeach; ?>
                 </div>
-                <button class="btn btn-primary" type="submit">Save Permissions</button>
             </form>
+        </div>
+        <div class="permission-save-bar">
+            <button class="btn btn-primary" type="submit" form="role-permissions-form">Save Permissions</button>
         </div>
     </div>
 </section>
