@@ -46,6 +46,13 @@ final class HttpClient
         return $this->request('POST', $path, $data);
     }
 
+    public function setCookie(string $name, string $value, string $domain = 'localhost'): void
+    {
+        $content = "# Netscape HTTP Cookie File\n";
+        $content .= $domain . "\tFALSE\t/\tFALSE\t0\t" . $name . "\t" . $value . "\n";
+        file_put_contents($this->cookieFile, $content);
+    }
+
     private function request(string $method, string $path, array $data = []): HttpResponse
     {
         $url = rtrim($this->baseUrl, '/') . '/' . ltrim($path, '/');
@@ -299,7 +306,17 @@ final class CrudTestRunner
             $this->assertHttp($apply, [200], 'Apply page');
             $this->assertHttp($login, [200], 'Login page');
             $this->assertTrue(str_contains($apply->body, 'Membership'), 'Apply form did not render expected content.');
-            return 'Apply and login pages returned 200.';
+            $this->assertTrue(str_contains($apply->body, 'accept_terms'), 'Apply form did not render legal acceptance fields.');
+            return 'Apply and login pages returned 200 with legal acceptance fields.';
+        });
+
+        $this->test('Legal Policies', 'READ', 'Public legal page loads all policy sections', function () use ($client): string {
+            $response = $client->get('legal.php?document=terms_of_use');
+            $this->assertHttp($response, [200], 'Legal page');
+            $this->assertTrue(str_contains($response->body, 'Terms of Use'), 'Terms of Use missing.');
+            $this->assertTrue(str_contains($response->body, 'Terms of Service'), 'Terms of Service missing.');
+            $this->assertTrue(str_contains($response->body, 'Privacy Statement'), 'Privacy Statement missing.');
+            return 'Public legal page returned all legal sections.';
         });
     }
 
@@ -333,6 +350,40 @@ final class CrudTestRunner
             $after = $client->get('admin/dashboard.php');
             $this->assertRedirect($after, 'Dashboard after logout', 'login.php');
             return 'Login reached dashboard; logout cleared session.';
+        });
+
+        $this->test('Legal Policies', 'CREATE', 'First login requires policy acceptance before dashboard', function (): string {
+            $client = new HttpClient($this->baseUrl, 'zest_policy_gate_' . uniqid('', true) . '.txt');
+            $login = $client->post('login.php', [
+                'username' => TEST_PREFIX . 'SUPERADMIN',
+                'password' => 'TestPass123!',
+            ]);
+            $this->assertRedirect($login, 'Login before policy acceptance', 'accept-policies.php');
+
+            $dashboard = $client->get('admin/dashboard.php');
+            $this->assertRedirect($dashboard, 'Dashboard before policy acceptance', 'accept-policies.php');
+
+            $acceptPage = $client->get('accept-policies.php');
+            $this->assertHttp($acceptPage, [200], 'Policy acceptance page');
+            $this->assertTrue(str_contains($acceptPage->body, 'Review'), 'Policy page did not render review content.');
+
+            $accept = $client->post('accept-policies.php', ['policy_version' => '1.0']);
+            $this->assertRedirect($accept, 'Accept current policies', 'admin/dashboard.php');
+
+            $after = $client->get('admin/dashboard.php');
+            $this->assertHttp($after, [200], 'Dashboard after policy acceptance');
+            return 'Policy gate blocked dashboard until current policies were accepted.';
+        });
+
+        $this->test('Legal Policies', 'READ', 'Tampered policy cookie is not trusted', function (): string {
+            $client = new HttpClient($this->baseUrl, 'zest_policy_tamper_' . uniqid('', true) . '.txt');
+            $client->setCookie('ilhf_policy_acceptance', 'tampered-cookie');
+            $login = $client->post('login.php', [
+                'username' => TEST_PREFIX . 'SUPERADMIN',
+                'password' => 'TestPass123!',
+            ]);
+            $this->assertRedirect($login, 'Login with tampered policy cookie', 'accept-policies.php');
+            return 'Tampered cookie did not bypass the policy gate.';
         });
 
         $this->test('Permissions', 'READ', 'Member cannot manually access admin CRUD URLs', function (): string {
@@ -806,6 +857,12 @@ final class CrudTestRunner
             'password' => 'TestPass123!',
         ]);
         $this->assertRedirect($response, 'Login ' . $actor);
+
+        if (str_contains($response->location(), 'accept-policies.php')) {
+            $accept = $client->post('accept-policies.php', ['policy_version' => '1.0']);
+            $this->assertRedirect($accept, 'Accept policies for ' . $actor);
+        }
+
         return $client;
     }
 
@@ -833,6 +890,9 @@ final class CrudTestRunner
             'secondary_year_graduated' => '2011',
             'college_school' => TEST_PREFIX . ' College',
             'college_year_graduated' => '2015',
+            'accept_terms' => '1',
+            'accept_privacy' => '1',
+            'accept_fitness_risk' => '1',
         ]);
         $this->assertRedirect($response, 'Valid public application submit', 'apply.php');
         $applicationId = (int) $this->scalar('SELECT application_id FROM MEMBERSHIP_APPLICATION WHERE desired_username = ?', [$username]);

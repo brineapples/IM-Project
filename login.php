@@ -14,7 +14,7 @@ if (userCount() === 0) {
 }
 
 if (isLoggedIn()) {
-    redirect(userCanAccessAdminArea() ? 'admin/dashboard.php' : 'sessions.php');
+    redirect(hasAcceptedCurrentPolicies() ? (userCanAccessAdminArea() ? 'admin/dashboard.php' : 'sessions.php') : 'accept-policies.php');
 }
 
 $errors = [];
@@ -40,7 +40,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         session_regenerate_id(true);
         $_SESSION['user_id'] = (int) $user['user_id'];
         logActivity((int) $user['user_id'], 'LOGIN_SUCCESS', 'User ' . $user['username'] . ' logged in successfully.');
-        redirect(userCanAccessAdminArea((int) $user['user_id']) ? 'admin/dashboard.php' : 'sessions.php');
+
+        $target = userCanAccessAdminArea((int) $user['user_id']) ? 'admin/dashboard.php' : 'sessions.php';
+        if (!hasAcceptedCurrentPolicies((int) $user['user_id'])) {
+            $_SESSION['policy_intended_url'] = $target;
+            redirect('accept-policies.php');
+        }
+
+        redirect($target);
     }
 
     logFailedLogin($username, $user ? (int) $user['user_id'] : null);

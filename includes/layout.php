@@ -92,6 +92,7 @@ function renderPublicHeader(string $title, string $active = ''): void
                                     <?php if (userCanAccessAdminArea()): ?>
                                         <li><a href="<?= e(url('admin/dashboard.php')) ?>">Dashboard</a></li>
                                     <?php endif; ?>
+                                    <li><a href="<?= e(url('settings.php')) ?>">Settings</a></li>
                                     <li><a href="<?= e(url('logout.php')) ?>">Logout</a></li>
                                 <?php endif; ?>
                             </ul>
@@ -121,6 +122,7 @@ function renderAdminHeader(string $title, string $active = ''): void
                 <?php renderBrand(); ?>
                 <div class="admin-topbar-actions">
                     <a class="admin-link-titlecase" href="<?= e(url('index.php')) ?>">Landing Page</a>
+                    <a class="admin-link-titlecase" href="<?= e(url('settings.php')) ?>">Settings</a>
                     <a href="<?= e(url('logout.php')) ?>">Logout</a>
                 </div>
                 <button class="admin-menu-trigger" type="button" aria-label="Toggle admin menu" aria-expanded="false">
@@ -151,6 +153,7 @@ function renderAdminHeader(string $title, string $active = ''): void
                             <a class="<?= $active === 'logs' ? 'active' : '' ?>" href="<?= e(url('admin/logs.php')) ?>"><i class="fa fa-list-alt"></i> Logs</a>
                         <?php endif; ?>
                         <div class="admin-sidebar-divider"></div>
+                        <a class="admin-sidebar-utility" href="<?= e(url('settings.php')) ?>"><i class="fa fa-user"></i> Settings</a>
                         <a class="admin-sidebar-utility" href="<?= e(url('logout.php')) ?>"><i class="fa fa-sign-out"></i> Logout</a>
                     </nav>
                 </aside>
@@ -183,6 +186,9 @@ function renderFooter(): void
                 <p>
                     &copy; ILHF, Santo Nino Chapter. Theme base:
                     <a href="https://templatemo.com/tm-548-training-studio" target="_blank" rel="noopener">TemplateMo 548 Training Studio</a>.
+                    <a href="<?= e(url('legal.php?document=terms_of_use')) ?>">Terms of Use</a>
+                    <a href="<?= e(url('legal.php?document=terms_of_service')) ?>">Terms of Service</a>
+                    <a href="<?= e(url('legal.php?document=privacy_statement')) ?>">Privacy Statement</a>
                 </p>
             </div>
         </footer>
@@ -404,6 +410,213 @@ function renderFooter(): void
 
             items.forEach(function (item) {
                 observer.observe(item);
+            });
+        })();
+
+        // Legal policy scroll gates for acceptance pages and application submit popups.
+        (function () {
+            var readDocuments = {};
+            var threshold = 10;
+            var applicationForm = document.querySelector('[data-application-policy-form]');
+            var pendingApplicationSubmit = false;
+            var applicationPolicySequence = ['terms_of_use', 'terms_of_service', 'privacy_statement', 'fitness_risk'];
+
+            function isScrolledToBottom(element) {
+                return element.scrollTop + element.clientHeight >= element.scrollHeight - threshold;
+            }
+
+            function markStatusComplete(status) {
+                if (!status) {
+                    return;
+                }
+
+                status.textContent = 'Read complete';
+                status.classList.add('complete');
+            }
+
+            function bindScrollBox(box, onComplete, checkImmediately) {
+                var completed = false;
+
+                function check() {
+                    if (box.offsetParent === null && !box.closest('.policy-modal.is-open')) {
+                        return;
+                    }
+
+                    if (completed || !isScrolledToBottom(box)) {
+                        return;
+                    }
+
+                    completed = true;
+                    onComplete();
+                }
+
+                box.policyCheckScrollComplete = check;
+                box.addEventListener('scroll', check);
+                if (checkImmediately) {
+                    window.setTimeout(check, 50);
+                }
+            }
+
+            function openPolicyModal(type) {
+                var modal = document.querySelector('[data-policy-modal="' + type + '"]');
+                if (!modal) {
+                    return;
+                }
+
+                modal.classList.add('is-open');
+                modal.setAttribute('aria-hidden', 'false');
+
+                var box = modal.querySelector('[data-policy-modal-scroll]');
+                if (box && typeof box.policyCheckScrollComplete === 'function') {
+                    window.setTimeout(box.policyCheckScrollComplete, 50);
+                }
+            }
+
+            function closePolicyModal(modal) {
+                if (!modal) {
+                    return;
+                }
+
+                modal.classList.remove('is-open');
+                modal.setAttribute('aria-hidden', 'true');
+            }
+
+            document.querySelectorAll('[data-policy-scroll]').forEach(function (box) {
+                var type = box.getAttribute('data-policy-scroll');
+                var status = document.querySelector('[data-policy-status="' + type + '"]');
+                var submit = document.querySelector('[data-policy-submit]');
+                var summary = document.querySelector('[data-policy-summary]');
+
+                bindScrollBox(box, function () {
+                    readDocuments[type] = true;
+                    markStatusComplete(status);
+
+                    var required = Array.prototype.slice.call(document.querySelectorAll('[data-policy-scroll]'));
+                    var allRead = required.every(function (requiredBox) {
+                        return readDocuments[requiredBox.getAttribute('data-policy-scroll')];
+                    });
+
+                    if (allRead && submit) {
+                        submit.disabled = false;
+                        if (summary) {
+                            summary.textContent = 'All policy documents are complete.';
+                        }
+                    }
+                }, true);
+            });
+
+            function updateApplicationPolicyFields() {
+                var termsInput = document.querySelector('[data-policy-hidden="terms"]');
+                var privacyInput = document.querySelector('[data-policy-hidden="privacy"]');
+                var fitnessInput = document.querySelector('[data-policy-hidden="fitness_risk"]');
+
+                if (termsInput && readDocuments.terms_of_use && readDocuments.terms_of_service) {
+                    termsInput.value = '1';
+                }
+
+                if (privacyInput && readDocuments.privacy_statement) {
+                    privacyInput.value = '1';
+                }
+
+                if (fitnessInput && readDocuments.fitness_risk) {
+                    fitnessInput.value = '1';
+                }
+            }
+
+            function applicationPoliciesComplete() {
+                var termsInput = document.querySelector('[data-policy-hidden="terms"]');
+                var privacyInput = document.querySelector('[data-policy-hidden="privacy"]');
+                var fitnessInput = document.querySelector('[data-policy-hidden="fitness_risk"]');
+
+                return (!termsInput || termsInput.value === '1')
+                    && (!privacyInput || privacyInput.value === '1')
+                    && (!fitnessInput || fitnessInput.value === '1');
+            }
+
+            function openNextApplicationPolicy() {
+                var nextType = applicationPolicySequence.find(function (type) {
+                    return !readDocuments[type];
+                });
+
+                if (nextType) {
+                    openPolicyModal(nextType);
+                    return;
+                }
+
+                updateApplicationPolicyFields();
+                if (pendingApplicationSubmit && applicationForm && applicationPoliciesComplete()) {
+                    pendingApplicationSubmit = false;
+                    applicationForm.setAttribute('data-policy-complete', 'true');
+
+                    if (applicationForm.requestSubmit) {
+                        applicationForm.requestSubmit();
+                    } else {
+                        applicationForm.submit();
+                    }
+                }
+            }
+
+            document.querySelectorAll('[data-policy-modal-scroll]').forEach(function (box) {
+                var type = box.getAttribute('data-policy-modal-scroll');
+                var status = document.querySelector('[data-policy-modal-status="' + type + '"]');
+                var button = document.querySelector('[data-policy-modal-read="' + type + '"]');
+
+                bindScrollBox(box, function () {
+                    markStatusComplete(status);
+                    if (button) {
+                        button.disabled = false;
+                    }
+                }, false);
+            });
+
+            document.querySelectorAll('[data-policy-modal-open]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var type = button.getAttribute('data-policy-modal-open');
+                    openPolicyModal(type);
+                });
+            });
+
+            document.querySelectorAll('[data-policy-modal-close]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    closePolicyModal(button.closest('[data-policy-modal]'));
+                });
+            });
+
+            document.querySelectorAll('[data-policy-modal-read]').forEach(function (button) {
+                button.addEventListener('click', function () {
+                    var type = button.getAttribute('data-policy-modal-read');
+                    var modal = button.closest('[data-policy-modal]');
+                    readDocuments[type] = true;
+                    updateApplicationPolicyFields();
+                    closePolicyModal(modal);
+
+                    if (pendingApplicationSubmit) {
+                        openNextApplicationPolicy();
+                    }
+                });
+            });
+
+            if (applicationForm) {
+                applicationForm.addEventListener('submit', function (event) {
+                    if (applicationForm.getAttribute('data-policy-complete') === 'true' || applicationPoliciesComplete()) {
+                        applicationForm.setAttribute('data-policy-complete', 'true');
+                        return;
+                    }
+
+                    event.preventDefault();
+                    pendingApplicationSubmit = true;
+                    openNextApplicationPolicy();
+                });
+            }
+
+            document.addEventListener('keydown', function (event) {
+                if (event.key !== 'Escape') {
+                    return;
+                }
+
+                document.querySelectorAll('.policy-modal.is-open').forEach(function (modal) {
+                    closePolicyModal(modal);
+                });
             });
         })();
         </script>

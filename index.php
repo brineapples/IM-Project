@@ -19,6 +19,7 @@ if (userCount() === 0) {
 
 $ctaPath = isLoggedIn() ? 'sessions.php' : 'apply.php';
 $ctaText = isLoggedIn() ? 'View Sessions' : 'Apply Now';
+$placeholderImage = url('assets/elementor-placeholder-image.png');
 
 // -----------------------------
 // HTML Output
@@ -27,14 +28,12 @@ $ctaText = isLoggedIn() ? 'View Sessions' : 'Apply Now';
 renderPublicHeader('Home', 'home');
 ?>
 <section class="landing-hero">
-    <video autoplay muted loop playsinline>
-        <source src="<?= e(asset('images/gym-video.mp4')) ?>" type="video/mp4">
-    </video>
+    <img class="landing-hero-media" src="<?= e($placeholderImage) ?>" alt="">
     <div class="landing-hero-overlay"></div>
     <div class="container landing-hero-content">
-        <p class="landing-eyebrow">ILHF</p>
-        <h1>Lorem ipsum <em>dolor sit</em> amet</h1>
-        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Integer vitae libero sed arcu facilisis gravida.</p>
+        <p class="landing-eyebrow">ILHF Santo Nino Chapter</p>
+        <h1>Join the Movement. <em>Dance, Sweat,</em> and Stay Active.</h1>
+        <p>View upcoming Zumba sessions, submit your application, and stay connected with the I Love Health &amp; Fitness community.</p>
         <div class="landing-actions">
             <a class="btn btn-primary" href="<?= e(url($ctaPath)) ?>"><?= e($ctaText) ?></a>
             <?php if (!isLoggedIn()): ?>
@@ -47,8 +46,8 @@ renderPublicHeader('Home', 'home');
 <section class="landing-band">
     <div class="container">
         <div class="landing-band-content">
-            <h2>Lorem ipsum dolor sit amet</h2>
-            <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Maecenas lacinia, augue vitae tincidunt suscipit, arcu sem luctus libero, vitae cursus lorem lectus non justo.</p>
+            <h2>Ready to join our next Zumba session?</h2>
+            <p>Check available schedules, send your application, and stay informed about chapter activities in one simple system.</p>
             <div class="landing-actions landing-actions-center">
                 <a class="btn btn-primary" href="<?= e(url($ctaPath)) ?>"><?= e($ctaText) ?></a>
                 <?php if (!isLoggedIn()): ?>
@@ -63,30 +62,30 @@ renderPublicHeader('Home', 'home');
     <div class="container">
         <div class="app-heading landing-heading">
             <div>
-                <h1>Lorem <em>Ipsum</em></h1>
-                <p class="app-muted mb-0">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed vitae arcu sed justo cursus bibendum.</p>
+                <h1>Contact <em>Our Chapter</em></h1>
+                <p class="app-muted mb-0">Reach the people who help coordinate sessions, applications, and member support for ILHF Santo Nino Chapter.</p>
             </div>
         </div>
 
         <div class="landing-coach-grid">
             <article class="landing-coach-card">
-                <img src="<?= e(asset('images/first-trainer.jpg')) ?>" alt="">
-                <span>Chapter President</span>
-                <h2>Anabelle Reloj</h2>
+                <img src="<?= e($placeholderImage) ?>" alt="">
+                <span> </span>
+                <h2> </h2>
                 <div class="landing-coach-links">
-                    <a href="#" aria-label="Anabelle Reloj Facebook link placeholder">Facebook</a>
-                    <a href="#" aria-label="Anabelle Reloj Messenger link placeholder">Messenger</a>
+                    <a href="#" aria-label=" ">&nbsp;</a>
+                    <a href="#" aria-label=" ">&nbsp;</a>
                 </div>
             </article>
             <article class="landing-coach-card">
-                <img src="<?= e(asset('images/second-trainer.jpg')) ?>" alt="">
-                <span>Consectetur</span>
-                <h2>Amet Elit</h2>
+                <img src="<?= e($placeholderImage) ?>" alt="">
+                <span> </span>
+                <h2> </h2>
             </article>
             <article class="landing-coach-card">
-                <img src="<?= e(asset('images/third-trainer.jpg')) ?>" alt="">
-                <span>Adipiscing</span>
-                <h2>Tempor Incididunt</h2>
+                <img src="<?= e($placeholderImage) ?>" alt="">
+                <span> </span>
+                <h2> </h2>
             </article>
         </div>
     </div>

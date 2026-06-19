@@ -17,35 +17,47 @@ if (userCount() === 0) {
 // Lookup Data
 // -----------------------------
 
+$applyTestModeFile = __DIR__ . '/config/apply_test_mode.php';
+$applyTestMode = is_file($applyTestModeFile) ? require $applyTestModeFile : [];
+$applyTestModeEnabled = !empty($applyTestMode['enabled']);
+
 $barangays = getBarangayOptions();
 $chapters = db()->query('SELECT chapter_id, chapter_name FROM CHAPTER ORDER BY chapter_name')->fetchAll();
 $genders = db()->query('SELECT gender_id, gender_name FROM GENDER ORDER BY gender_name')->fetchAll();
 $memberStatuses = db()->query('SELECT member_status_id, status_name FROM MEMBER_STATUS ORDER BY status_name')->fetchAll();
 $educationLevels = db()->query('SELECT educational_attainment_id, level_name FROM EDUCATIONAL_ATTAINMENT ORDER BY level_name')->fetchAll();
+$policyDocuments = policyDocuments();
+
+$firstChapterId = (string) ($chapters[0]['chapter_id'] ?? '');
+$firstGenderId = (string) ($genders[0]['gender_id'] ?? '');
+$firstMemberStatusId = (string) ($memberStatuses[0]['member_status_id'] ?? '');
+$firstEducationId = (string) ($educationLevels[0]['educational_attainment_id'] ?? '');
+$testUsername = ($applyTestMode['username_prefix'] ?? 'TEST_APPLY_') . date('YmdHis');
+$testPassword = $applyTestModeEnabled ? (string) ($applyTestMode['password'] ?? 'TestPass123!') : '';
 
 // -----------------------------
 // Form Defaults
 // -----------------------------
 
 $fields = [
-    'desired_username' => '',
-    'first_name' => '',
-    'middle_name' => '',
-    'last_name' => '',
-    'address' => '',
-    'birthday' => '',
-    'member_status_id' => '',
-    'phone_number' => '',
-    'barangay_id' => '',
-    'chapter_id' => '',
-    'gender_id' => '',
-    'educational_attainment_id' => '',
-    'primary_school' => '',
-    'primary_year_graduated' => '',
-    'secondary_school' => '',
-    'secondary_year_graduated' => '',
-    'college_school' => '',
-    'college_year_graduated' => '',
+    'desired_username' => $applyTestModeEnabled ? $testUsername : '',
+    'first_name' => $applyTestModeEnabled ? (string) ($applyTestMode['first_name'] ?? '') : '',
+    'middle_name' => $applyTestModeEnabled ? (string) ($applyTestMode['middle_name'] ?? '') : '',
+    'last_name' => $applyTestModeEnabled ? (string) ($applyTestMode['last_name'] ?? '') : '',
+    'address' => $applyTestModeEnabled ? (string) ($applyTestMode['address'] ?? '') : '',
+    'birthday' => $applyTestModeEnabled ? (string) ($applyTestMode['birthday'] ?? '') : '',
+    'member_status_id' => $applyTestModeEnabled ? $firstMemberStatusId : '',
+    'phone_number' => $applyTestModeEnabled ? (string) ($applyTestMode['phone_number'] ?? '') : '',
+    'barangay_id' => $applyTestModeEnabled ? '28' : '',
+    'chapter_id' => $applyTestModeEnabled ? $firstChapterId : '',
+    'gender_id' => $applyTestModeEnabled ? $firstGenderId : '',
+    'educational_attainment_id' => $applyTestModeEnabled ? $firstEducationId : '',
+    'primary_school' => $applyTestModeEnabled ? (string) ($applyTestMode['primary_school'] ?? '') : '',
+    'primary_year_graduated' => $applyTestModeEnabled ? (string) ($applyTestMode['primary_year_graduated'] ?? '') : '',
+    'secondary_school' => $applyTestModeEnabled ? (string) ($applyTestMode['secondary_school'] ?? '') : '',
+    'secondary_year_graduated' => $applyTestModeEnabled ? (string) ($applyTestMode['secondary_year_graduated'] ?? '') : '',
+    'college_school' => $applyTestModeEnabled ? (string) ($applyTestMode['college_school'] ?? '') : '',
+    'college_year_graduated' => $applyTestModeEnabled ? (string) ($applyTestMode['college_year_graduated'] ?? '') : '',
 ];
 
 foreach ($fields as $field => $default) {
@@ -105,6 +117,9 @@ function optionalYearValue(string $value, array &$errors, string $label): ?int
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $password = $_POST['password'] ?? '';
     $confirmPassword = $_POST['confirm_password'] ?? '';
+    $acceptedTerms = ($_POST['accept_terms'] ?? '') === '1';
+    $acceptedPrivacy = ($_POST['accept_privacy'] ?? '') === '1';
+    $acceptedFitnessRisk = ($_POST['accept_fitness_risk'] ?? '') === '1';
 
     foreach ([
         'desired_username' => 'Username',
@@ -125,6 +140,18 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($password !== $confirmPassword) {
         $errors[] = 'Passwords do not match.';
+    }
+
+    if (!$acceptedTerms) {
+        $errors[] = 'You must agree to the Terms of Use and Terms of Service.';
+    }
+
+    if (!$acceptedPrivacy) {
+        $errors[] = 'You must consent to the Privacy Statement.';
+    }
+
+    if (!$acceptedFitnessRisk) {
+        $errors[] = 'You must acknowledge the fitness activity risk statement.';
     }
 
     $birthdayTime = strtotime($fields['birthday']);
@@ -234,7 +261,13 @@ renderPublicHeader('Apply for Membership', 'apply');
                 </div>
             <?php endif; ?>
 
-            <form method="post" class="application-form">
+            <?php if ($applyTestModeEnabled): ?>
+                <div class="alert alert-warning">
+                    Application test mode is active. Delete <strong>config/apply_test_mode.php</strong> to restore the normal blank form.
+                </div>
+            <?php endif; ?>
+
+            <form method="post" class="application-form" data-application-policy-form>
                 <h2 class="form-section-title">Account Request</h2>
                 <div class="form-row">
                     <div class="form-group col-md-4">
@@ -243,11 +276,11 @@ renderPublicHeader('Apply for Membership', 'apply');
                     </div>
                     <div class="form-group col-md-4">
                         <label for="password">Password</label>
-                        <input class="form-control" id="password" type="password" name="password" required>
+                        <input class="form-control" id="password" type="password" name="password" value="<?= e($testPassword) ?>" required>
                     </div>
                     <div class="form-group col-md-4">
                         <label for="confirm_password">Confirm Password</label>
-                        <input class="form-control" id="confirm_password" type="password" name="confirm_password" required>
+                        <input class="form-control" id="confirm_password" type="password" name="confirm_password" value="<?= e($testPassword) ?>" required>
                     </div>
                 </div>
 
@@ -380,9 +413,50 @@ renderPublicHeader('Apply for Membership', 'apply');
                     </div>
                 </div>
 
+                <input type="hidden" name="accept_terms" value="" data-policy-hidden="terms">
+                <input type="hidden" name="accept_privacy" value="" data-policy-hidden="privacy">
+                <input type="hidden" name="accept_fitness_risk" value="" data-policy-hidden="fitness_risk">
+
                 <button class="btn btn-primary" type="submit">Submit Application</button>
             </form>
         </div>
     </div>
 </section>
+
+<?php foreach ($policyDocuments as $type => $document): ?>
+    <div class="policy-modal" data-policy-modal="<?= e($type) ?>" aria-hidden="true">
+        <div class="policy-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="policy-modal-title-<?= e($type) ?>">
+            <button class="policy-modal-close" type="button" data-policy-modal-close aria-label="Close policy document">&times;</button>
+            <h2 id="policy-modal-title-<?= e($type) ?>"><?= e($document['title']) ?></h2>
+            <p class="app-muted">Version <?= e($document['version']) ?> | Effective <?= e(date('F j, Y', strtotime($document['effective_date']))) ?></p>
+            <div class="policy-modal-body" data-policy-modal-scroll="<?= e($type) ?>" tabindex="0">
+                <?= nl2br(e($document['content'])) ?>
+            </div>
+            <div class="policy-modal-actions">
+                <span class="policy-read-status" data-policy-modal-status="<?= e($type) ?>">Scroll to the bottom to continue</span>
+                <button class="btn btn-primary" type="button" data-policy-modal-read="<?= e($type) ?>" disabled>I have read this</button>
+            </div>
+        </div>
+    </div>
+<?php endforeach; ?>
+
+<div class="policy-modal" data-policy-modal="fitness_risk" aria-hidden="true">
+    <div class="policy-modal-dialog" role="dialog" aria-modal="true" aria-labelledby="policy-modal-title-fitness-risk">
+        <button class="policy-modal-close" type="button" data-policy-modal-close aria-label="Close policy document">&times;</button>
+        <h2 id="policy-modal-title-fitness-risk">Fitness Activity Acknowledgment</h2>
+        <p class="app-muted">Please review this acknowledgment before submitting your application.</p>
+        <div class="policy-modal-body" data-policy-modal-scroll="fitness_risk" tabindex="0">
+            I understand that Zumba and other fitness activities involve physical movement and may carry risks such as fatigue, strain, injury, or other health concerns.
+
+            I confirm that I am responsible for considering my own health condition before joining any activity. This application and the information shown in the system do not replace professional medical advice, diagnosis, or treatment.
+
+            If I have a medical condition, injury, or concern about participating in fitness activities, I understand that I should consult a qualified health professional before joining a session.
+        </div>
+        <div class="policy-modal-actions">
+            <span class="policy-read-status" data-policy-modal-status="fitness_risk">Scroll to the bottom to continue</span>
+            <button class="btn btn-primary" type="button" data-policy-modal-read="fitness_risk" disabled>I understand and agree</button>
+        </div>
+    </div>
+</div>
+
 <?php renderFooter(); ?>

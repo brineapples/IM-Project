@@ -10,6 +10,11 @@ if (session_status() === PHP_SESSION_NONE) {
     session_start();
 }
 
+const POLICY_VERSION = '1.0';
+const POLICY_EFFECTIVE_DATE = '2026-06-15';
+const POLICY_COOKIE_NAME = 'ilhf_policy_acceptance';
+const POLICY_CONTACT_EMAIL = 'keyinformationrecordkeepers@gmail.com';
+
 // -----------------------------
 // Basic Output and URL Helpers
 // -----------------------------
@@ -49,6 +54,264 @@ function consumeFlash(): array
     $messages = $_SESSION['flash'] ?? [];
     unset($_SESSION['flash']);
     return $messages;
+}
+
+// -----------------------------
+// Legal Policy Helpers
+// -----------------------------
+
+function policyTypes(): array
+{
+    return [
+        'terms_of_use' => 'Terms of Use',
+        'terms_of_service' => 'Terms of Service',
+        'privacy_statement' => 'Privacy Statement',
+    ];
+}
+
+function normalizePolicyText(string $text): string
+{
+    $text = str_replace(["\r\n", "\r"], "\n", $text);
+    $text = preg_replace('/Effective Date:\s*\[([^\]\n]+)\]+/i', 'Effective Date: $1', $text) ?? $text;
+    return trim($text);
+}
+
+function policyHeadingPosition(string $source, string $title): ?int
+{
+    $pattern = '/^' . preg_quote($title, '/') . '\s*$/mi';
+    if (!preg_match($pattern, $source, $matches, PREG_OFFSET_CAPTURE)) {
+        return null;
+    }
+
+    return (int) $matches[0][1];
+}
+
+function policyDocuments(): array
+{
+    static $documents = null;
+    if ($documents !== null) {
+        return $documents;
+    }
+
+    $filePath = __DIR__ . '/../assets/KIRK_ILHF_Terms and Conditions.txt';
+    $source = is_file($filePath) ? file_get_contents($filePath) : '';
+    $source = normalizePolicyText($source === false ? '' : $source);
+    $positions = [];
+
+    foreach (policyTypes() as $type => $title) {
+        $position = policyHeadingPosition($source, $title);
+        if ($position !== null) {
+            $positions[$type] = $position;
+        }
+    }
+
+    asort($positions);
+    $orderedTypes = array_keys($positions);
+    $documents = [];
+
+    foreach (policyTypes() as $type => $title) {
+        $content = '';
+        if (isset($positions[$type])) {
+            $currentIndex = array_search($type, $orderedTypes, true);
+            $start = $positions[$type];
+            $nextType = $orderedTypes[$currentIndex + 1] ?? null;
+            $end = $nextType ? $positions[$nextType] : strlen($source);
+            $content = trim(substr($source, $start, $end - $start));
+            $content = preg_replace('/^\s*' . preg_quote($title, '/') . '\s*/i', '', $content) ?? $content;
+        }
+
+        $documents[$type] = [
+            'type' => $type,
+            'title' => $title,
+            'version' => POLICY_VERSION,
+            'effective_date' => POLICY_EFFECTIVE_DATE,
+            'content' => trim($content) !== '' ? trim($content) : 'Policy content is currently unavailable.',
+        ];
+    }
+
+    return $documents;
+}
+
+function policyDocument(string $type): ?array
+{
+    $documents = policyDocuments();
+    return $documents[$type] ?? null;
+}
+
+function base64UrlEncode(string $value): string
+{
+    return rtrim(strtr(base64_encode($value), '+/', '-_'), '=');
+}
+
+function base64UrlDecode(string $value): ?string
+{
+    $padding = strlen($value) % 4;
+    if ($padding > 0) {
+        $value .= str_repeat('=', 4 - $padding);
+    }
+
+    $decoded = base64_decode(strtr($value, '-_', '+/'), true);
+    return $decoded === false ? null : $decoded;
+}
+
+function policySigningSecret(): string
+{
+    return hash('sha256', __DIR__ . '|ILHF_ZEST_POLICY_ACCEPTANCE|' . POLICY_EFFECTIVE_DATE);
+}
+
+function signPolicyPayload(string $encodedPayload): string
+{
+    return hash_hmac('sha256', $encodedPayload, policySigningSecret());
+}
+
+function policyCookiePayload(?int $userId = null): ?array
+{
+    $cookieValue = $_COOKIE[POLICY_COOKIE_NAME] ?? '';
+    if (!is_string($cookieValue) || !str_contains($cookieValue, '.')) {
+        return null;
+    }
+
+    [$encodedPayload, $signature] = explode('.', $cookieValue, 2);
+    if ($encodedPayload === '' || $signature === '' || !hash_equals(signPolicyPayload($encodedPayload), $signature)) {
+        return null;
+    }
+
+    $json = base64UrlDecode($encodedPayload);
+    $payload = $json === null ? null : json_decode($json, true);
+    if (!is_array($payload)) {
+        return null;
+    }
+
+    $expectedUserId = $userId ?? (int) ($_SESSION['user_id'] ?? 0);
+    if ($expectedUserId <= 0 || (int) ($payload['user_id'] ?? 0) !== $expectedUserId) {
+        return null;
+    }
+
+    if (($payload['policy_version'] ?? '') !== POLICY_VERSION || empty($payload['accepted_at'])) {
+        return null;
+    }
+
+    return $payload;
+}
+
+function hasAcceptedCurrentPolicies(?int $userId = null): bool
+{
+    $expectedUserId = $userId ?? (int) ($_SESSION['user_id'] ?? 0);
+    if ($expectedUserId <= 0) {
+        return false;
+    }
+
+    if (
+        !empty($_SESSION['policy_accepted'])
+        && ($_SESSION['policy_version'] ?? '') === POLICY_VERSION
+        && (int) ($_SESSION['policy_user_id'] ?? 0) === $expectedUserId
+    ) {
+        return true;
+    }
+
+    $payload = policyCookiePayload($expectedUserId);
+    if ($payload === null) {
+        unset($_SESSION['policy_accepted'], $_SESSION['policy_version'], $_SESSION['policy_user_id'], $_SESSION['policy_accepted_at']);
+        return false;
+    }
+
+    $_SESSION['policy_accepted'] = true;
+    $_SESSION['policy_version'] = POLICY_VERSION;
+    $_SESSION['policy_user_id'] = $expectedUserId;
+    $_SESSION['policy_accepted_at'] = $payload['accepted_at'];
+
+    return true;
+}
+
+function isHttpsRequest(): bool
+{
+    return (!empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off')
+        || (($_SERVER['HTTP_X_FORWARDED_PROTO'] ?? '') === 'https');
+}
+
+function setPolicyAcceptedForUser(int $userId): array
+{
+    $payload = [
+        'user_id' => $userId,
+        'policy_version' => POLICY_VERSION,
+        'accepted_at' => gmdate('c'),
+    ];
+    $encodedPayload = base64UrlEncode(json_encode($payload, JSON_THROW_ON_ERROR));
+    $cookieValue = $encodedPayload . '.' . signPolicyPayload($encodedPayload);
+
+    setcookie(POLICY_COOKIE_NAME, $cookieValue, [
+        'expires' => time() + (60 * 60 * 24 * 365),
+        'path' => '/',
+        'secure' => isHttpsRequest(),
+        'httponly' => true,
+        'samesite' => 'Lax',
+    ]);
+
+    $_COOKIE[POLICY_COOKIE_NAME] = $cookieValue;
+    $_SESSION['policy_accepted'] = true;
+    $_SESSION['policy_version'] = POLICY_VERSION;
+    $_SESSION['policy_user_id'] = $userId;
+    $_SESSION['policy_accepted_at'] = $payload['accepted_at'];
+
+    return $payload;
+}
+
+function policyAcceptanceDetails(?int $userId = null): ?array
+{
+    if (!hasAcceptedCurrentPolicies($userId)) {
+        return null;
+    }
+
+    return [
+        'policy_version' => $_SESSION['policy_version'] ?? POLICY_VERSION,
+        'accepted_at' => $_SESSION['policy_accepted_at'] ?? null,
+    ];
+}
+
+function currentRelativeRequestPath(): string
+{
+    $requestUri = $_SERVER['REQUEST_URI'] ?? '';
+    $base = url('');
+
+    if ($requestUri !== '' && str_starts_with($requestUri, $base)) {
+        $relative = ltrim(substr($requestUri, strlen($base)), '/');
+        return $relative === '' ? 'index.php' : $relative;
+    }
+
+    return 'admin/dashboard.php';
+}
+
+function rememberPolicyReturnPath(): void
+{
+    $path = currentRelativeRequestPath();
+    $pageOnly = strtok($path, '?') ?: $path;
+    $publicPolicyPages = ['accept-policies.php', 'login.php', 'logout.php', 'legal.php', 'apply.php', 'index.php', 'setup.php'];
+
+    if (!in_array($pageOnly, $publicPolicyPages, true)) {
+        $_SESSION['policy_intended_url'] = $path;
+    }
+}
+
+function policyRedirectAfterAcceptance(): string
+{
+    $target = $_SESSION['policy_intended_url'] ?? null;
+    unset($_SESSION['policy_intended_url']);
+
+    if (is_string($target) && $target !== '') {
+        return $target;
+    }
+
+    return userCanAccessAdminArea() ? 'admin/dashboard.php' : 'sessions.php';
+}
+
+function requireAcceptedPolicies(): void
+{
+    requireLogin();
+
+    if (!hasAcceptedCurrentPolicies()) {
+        rememberPolicyReturnPath();
+        redirect('accept-policies.php');
+    }
 }
 
 // -----------------------------
@@ -188,6 +451,7 @@ function hasPermission(string $moduleName, string $actionName, ?int $userId = nu
 function requirePermission(string $moduleName, string $actionName): void
 {
     requireLogin();
+    requireAcceptedPolicies();
 
     if (!hasPermission($moduleName, $actionName)) {
         $user = currentUser();
@@ -235,6 +499,7 @@ function userCanAccessAdminArea(?int $userId = null): bool
 function requireAdminArea(): void
 {
     requireLogin();
+    requireAcceptedPolicies();
 
     if (!userCanAccessAdminArea()) {
         logCurrentUserActivity('PERMISSION_DENIED', 'User attempted to open the admin area without admin permissions.');
@@ -246,6 +511,7 @@ function requireAdminArea(): void
 function requireSuperAdmin(): void
 {
     requireLogin();
+    requireAcceptedPolicies();
 
     if (!isSuperAdmin()) {
         logCurrentUserActivity('PERMISSION_DENIED', 'User attempted to open a Super Admin page.');

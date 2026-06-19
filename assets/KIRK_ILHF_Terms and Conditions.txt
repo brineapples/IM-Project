@@ -1,0 +1,73 @@
+﻿Welcome to the I Love Health & Fitness (ILHF) Santo Niño Chapter! We are thrilled to have you join our community and support your wellness journey.
+Before you start tracking your goals and connecting with other members, please take a quick moment to read our Terms of Use below. These guidelines are designed to keep our web application a safe, respectful, and positive environment for everyone. By logging in and using the platform, you agree to follow these rules.
+Let's build a healthier, stronger Santo Niño together!
+Terms of Use
+Effective Date: [June 15, 2026]]
+These Terms of Use govern your access to and behavior on the I Love Health & Fitness (ILHF) Santo Niño Chapter web application.
+1. Acceptable Use
+You agree to use the application strictly for its intended purpose of tracking fitness, accessing health resources, and participating in the Santo Niño Chapter community. You agree not to:
+* Use the application for any unlawful purpose.
+* Interfere with or disrupt the security, servers, or networks connected to the application.
+* Attempt to gain unauthorized access to other members' accounts or the underlying system.
+* Scrape, data-mine, or extract data from the application without permission.
+2. User Conduct and Community Standards
+Our application includes features that allow members to interact. You agree that you will not post or share content that is:
+* Abusive, harassing, threatening, or defamatory toward any other member or administrator.
+* Spam, unauthorized advertising, or commercial solicitations.
+* Misleading, false, or impersonating another person.
+3. Intellectual Property
+All application software, designs, text, graphics, and logos are the property of the ILHF Santo Niño Chapter or its licensors. You are granted a limited, non-exclusive license to use the application for personal, non-commercial purposes. You may not reproduce or distribute any part of the application without prior written consent.
+4. Modifications to the App
+We reserve the right to modify, update, or discontinue any feature or part of the web application at any time without prior notice.
+
+
+
+
+Terms of Service
+Effective Date: [June 15, 2026]
+These Terms of Service outline the legal agreement regarding the services provided by the ILHF Santo Niño Chapter through this web application. By creating an account and using the service, you agree to these terms.
+1. Provision of Service
+The ILHF web application provides tools for health tracking, fitness program management, and community engagement. We strive to keep the service operational but do not guarantee uninterrupted access.
+2. User Accounts
+* Registration: You must provide accurate and complete information when creating an account.
+* Responsibility: You are responsible for maintaining the confidentiality of your login credentials. The ILHF Santo Niño Chapter is not liable for any loss or damage arising from your failure to protect your account.
+3. Medical and Fitness Disclaimer
+* Informational Purposes Only: The fitness programs, health tips, and tracking metrics provided by the service are not substitutes for professional medical advice, diagnosis, or treatment.
+* Assumption of Risk: Engaging in any fitness program carries inherent risks. By using this service, you assume full responsibility for any physical injuries or health issues that may arise from participating in workouts or following advice found on the platform. Always consult a physician before starting a new routine.
+4. Termination of Service
+We reserve the right to suspend or terminate your account at our sole discretion, without notice, if you breach these Terms of Service or the accompanying Terms of Use, or if your continued use poses a risk to the community or the platform.
+5. Limitation of Liability
+To the fullest extent permitted by law, the ILHF Santo Niño Chapter, its administrators, and developers shall not be liable for any indirect, incidental, special, or consequential damages resulting from the use or inability to use the service, including data loss or personal injury.
+
+
+
+
+Privacy Statement
+Effective Date: [June 15, 2026]]
+The ILHF Santo Niño Chapter respects your privacy. This statement explains how we collect, process, and protect your personal data when you use our web application.
+1. Information We Collect
+To provide and improve our services, we collect:
+* Account Information: Name, email address, phone number, and password.
+* Health and Biometric Data: Information you voluntarily provide, such as height, weight, body measurements, dietary logs, and workout history.
+* System Data: IP addresses, browser types, log-in timestamps, and device information to ensure system stability and security.
+2. How We Use Your Data
+We process your data strictly to:
+* Operate the application and provide personalized fitness tracking.
+* Facilitate communication between you, your trainers, and chapter administrators.
+* Generate aggregated, anonymous statistics to assess the overall health and engagement of the Santo Niño Chapter.
+* Maintain the security and integrity of our web application.
+3. Data Sharing and Protection
+* No Selling: We will never sell or rent your personal or health data to third parties.
+* Service Providers: We may use trusted third-party hosting services to run the application, which are bound by strict data confidentiality agreements.
+* Legal Compliance: We may disclose information if required by law or to protect the safety of our members.
+4. Data Security
+We employ industry-standard security measures to protect your data from unauthorized access, alteration, or destruction. However, no digital platform can guarantee absolute security.
+5. Your Privacy Rights
+You maintain control over your data. You have the right to:
+* Access the personal information we have collected about you.
+* Request corrections to inaccurate or incomplete data.
+* Request the deletion of your account and associated personal data.
+* Restrict or object to certain types of data processing.
+6. Contact Information
+For any privacy-related inquiries or to exercise your data rights, please contact the administrators at:
+* Email: keyinformationrecordkeepers@gmail.com
